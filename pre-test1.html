@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>小学校国語_低学年_ドリル修正版</title>
+    <style>
+        /* --- 基本設定 --- */
+        @page { size: A4 landscape; margin: 0; }
+        body {
+            margin: 0; padding: 0;
+            background-color: #eee;
+            font-family: "UD Digi Kyokasho NK-R", "Yu Kyokasho", "BIZ UDPGothic", "Meiryo", sans-serif;
+            box-sizing: border-box;
+        }
+
+        /* --- 印刷用シート（A4横） --- */
+        .sheet {
+            width: 297mm; height: 210mm;
+            background-color: #fff;
+            padding: 10mm;
+            box-sizing: border-box;
+            display: none; /* デフォルト非表示 */
+            flex-direction: row-reverse; /* 右から左へ配置 */
+            margin: 0 auto;
+            position: relative;
+            page-break-after: always;
+        }
+        .sheet.active { display: flex; }
+
+        /* --- 共通：右サイドバー --- */
+        .sidebar {
+            width: 18%; height: 100%;
+            border: 2px solid #000; border-left: none;
+            box-sizing: border-box;
+            writing-mode: vertical-rl;
+            padding: 5mm;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-start;
+        }
+        .title { font-size: 16pt; font-weight: bold; margin-bottom: 10mm; letter-spacing: 2px; margin-top: 10mm; }
+        .name-box { font-size: 13pt; line-height: 1.8; letter-spacing: 0.1em; margin-top: 5mm; }
+        .instruction { font-size: 13pt; margin-top: auto; margin-bottom: 5mm; }
+        .page-num { position: absolute; bottom: 5mm; left: 50%; transform: translateX(-50%); font-size: 10pt; writing-mode: horizontal-tb;}
+
+        /* --- 共通：メインエリア --- */
+        .main-content {
+            width: 82%; height: 100%;
+            border: 2px solid #000;
+            box-sizing: border-box;
+            padding: 5mm;
+            position: relative;
+            display: flex;
+        }
+
+        /* --- レイアウトA：グリッド --- */
+        .layout-grid {
+            flex-direction: row-reverse;
+            justify-content: space-around; align-items: flex-start; height: 100%;
+        }
+        .grid-col {
+            height: 95%; width: 15%;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .q-header {
+            writing-mode: vertical-rl; font-size: 15pt;
+            margin-bottom: 8mm; height: 35mm;
+            display: flex; align-items: center; justify-content: flex-end;
+            padding-left: 2mm;
+        }
+        .masu-container { display: flex; flex-direction: column; }
+        .masu {
+            width: 22mm; height: 22mm; border: 1px solid #000;
+            margin-bottom: -1px; position: relative;
+        }
+        .masu::before { content: ""; position: absolute; top: 50%; left: 0; width: 100%; border-top: 1px dashed #ccc; }
+        .masu::after { content: ""; position: absolute; left: 50%; top: 0; height: 100%; border-left: 1px dashed #ccc; }
+        .illust { font-size: 35pt; margin-top: 5mm; text-align: center; }
+
+        /* --- レイアウトA-2：グリッド（下部に問題あり） --- */
+        .layout-grid-split {
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .grid-upper {
+            height: 50%; 
+            width: 100%;
+            display: flex; flex-direction: row-reverse; justify-content: space-around;
+            border-bottom: 2px dashed #aaa;
+            padding-bottom: 2mm;
+        }
+        .grid-upper .grid-col { height: 100%; }
+        .grid-upper .illust { font-size: 30pt; margin-top: 0; } 
+
+        .grid-lower {
+            height: 45%;
+            width: 100%;
+            padding-top: 2mm;
+            display: flex; 
+            flex-direction: row-reverse; 
+            justify-content: space-around; 
+            align-items: flex-start;
+        }
+        .footer-question {
+            writing-mode: vertical-rl; 
+            font-size: 16pt;
+            height: 100%;
+            line-height: 2; 
+            display: flex;
+            align-items: center; 
+            letter-spacing: 0.1em;
+            white-space: nowrap; 
+        }
+        .masu-inline {
+            display: inline-block; width: 16mm; height: 16mm; 
+            border: 2px solid #000; margin: 5px 2px; vertical-align: text-bottom;
+        }
+        .footer-label {
+            position: absolute; bottom: 2mm; right: 2mm; 
+            font-size: 12pt; border: 1px solid #000; padding: 2px 5px; border-radius: 5px;
+            background: #fff;
+        }
+
+        /* --- レイアウトB：文づくり --- */
+        .layout-bun {
+            flex-direction: row-reverse;
+            justify-content: space-around; height: 100%;
+            padding-right: 0;
+        }
+        .bun-row {
+            width: 32%; height: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            border-left: 1px dashed #ddd;
+        }
+        .bun-row:last-child { border-left: none; }
+        .bun-header {
+            height: 25%; width: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-bottom: 2px solid #000; margin-bottom: 5mm;
+        }
+        .bun-prompt { font-size: 14pt; margin-bottom: 2mm; font-weight: bold; writing-mode: horizontal-tb; text-align: center;}
+        .bun-illust { font-size: 35pt; }
+        .bun-masu-area { height: 70%; display: flex; flex-direction: row-reverse; gap: 3mm; }
+        .bun-col { display: flex; flex-direction: column; }
+        .masu-simple {
+            width: 16.5mm; height: 16.5mm; border: 1px solid #000; margin-bottom: -1px; 
+        }
+
+        /* --- レイアウトC：しりとり --- */
+        .layout-shiritori {
+            flex-direction: column; justify-content: space-around; height: 100%; padding: 0 5mm;
+        }
+        .shiritori-row {
+            display: flex; justify-content: space-between; align-items: center; height: 30%;
+            border-bottom: 1px dashed #ddd; padding-bottom: 2mm;
+        }
+        .shiritori-item {
+            display: flex; flex-direction: column; align-items: center; width: 22%;
+        }
+        .s-box {
+            width: 35mm; height: 35mm; border: 2px solid #000;
+            display: flex; align-items: center; justify-content: center; font-size: 40pt;
+            background: #fff;
+        }
+        .s-text { font-size: 12pt; margin-top: 2mm; text-align: center; }
+        .s-arrow { font-size: 30pt; color: #555; }
+        .s-empty { background-color: #fff; }
+
+        /* --- レイアウトD：間違い直し --- */
+        .layout-error {
+            flex-direction: row-reverse; justify-content: space-around; height: 100%;
+        }
+        .error-col {
+            width: 20%; height: 100%; 
+            display: flex; flex-direction: column; align-items: center; padding-top: 5mm;
+        }
+        .error-sentence {
+            writing-mode: vertical-rl; font-size: 18pt; height: 40%; letter-spacing: 0.1em;
+            padding-left: 0; margin-bottom: 5mm; margin-left: 0;
+            display: flex; align-items: center;
+        }
+        /* 修正：文字数に合わせて増減するマス */
+        .error-masu-container {
+            display: flex; flex-direction: column;
+            align-items: center;
+        }
+        .masu-error {
+            width: 18mm; height: 18mm; 
+            border: 1px solid #000;
+            margin-bottom: -1px; 
+            position: relative;
+        }
+        /* 十字リーダー */
+        .masu-error::before { content: ""; position: absolute; top: 50%; left: 0; width: 100%; border-top: 1px dashed #ccc; }
+        .masu-error::after { content: ""; position: absolute; left: 50%; top: 0; height: 100%; border-left: 1px dashed #ccc; }
+
+        .check-mark { font-size: 20pt; color: #d00; font-weight: bold; margin-bottom: 2mm;}
+
+        /* --- 操作パネル --- */
+        .control-panel {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: #333; color: #fff; padding: 15px;
+            z-index: 9999; display: flex; gap: 20px; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        select { font-size: 16px; padding: 8px; border-radius: 4px; }
+        button { 
+            font-size: 16px; padding: 8px 20px; cursor: pointer; 
+            background-color: #4CAF50; color: white; border: none; border-radius: 4px; font-weight: bold;
+        }
+        button:hover { background-color: #45a049; }
+        /* 遷移ボタン */
+        .nav-btn { background-color: #2196F3; }
+        .nav-btn:hover { background-color: #0b7dda; }
+        
+        @media print {
+            .control-panel { display: none !important; }
+            body, .sheet { background-color: #fff; margin: 0; }
+            .sheet { display: flex !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <label>低学年用ドリル:</label>
+        <select id="pageSelector" onchange="switchView()"></select>
+        <button onclick="window.print()">🖨️ 印刷する</button>
+        <button class="nav-btn" onclick="location.href='pre-test2.html'">➡ 中学年用ドリルへ</button>
+    </div>
+
+    <div id="sheets-container"></div>
+
+    <script>
+        const pages = [
+            // カタカナ
+            { id: 1, type: 'grid', title: 'かたかな（初級）★', inst: 'ひらがなを かたかなに なおしましょう。', 
+              data: [ { q: '①たくしい', ans: 4, img: '🚕' }, { q: '②ばなな', ans: 3, img: '🍌' }, { q: '③てれび', ans: 3, img: '📺' }, { q: '④かめら', ans: 3, img: '📷' }, { q: '⑤らじお', ans: 3, img: '📻' }, { q: '◎めろん', ans: 3, img: '🍈' } ] },
+            { id: 2, type: 'grid', title: 'かたかな（小さい字）★', inst: 'ひらがなを かたかなに なおしましょう。',
+              data: [ { q: '①よっと', ans: 3, img: '⛵' }, { q: '②べっど', ans: 3, img: '🛏️' }, { q: '③しょべる', ans: 4, img: '🚜' }, { q: '④しゃつ', ans: 3, img: '👕' }, { q: '⑤ろけっと', ans: 4, img: '🚀' }, { q: '◎ちょこ', ans: 3, img: '🍫' } ] },
+            { id: 3, type: 'grid', title: 'かたかな（のばす音）★', inst: 'ひらがなを かたかなに なおしましょう。',
+              data: [ { q: '①けえき', ans: 3, img: '🍰' }, { q: '②ぼおる', ans: 3, img: '⚽' }, { q: '③すぷうん', ans: 4, img: '🥄' }, { q: '④すきい', ans: 3, img: '🎿' }, { q: '⑤の音', ans: 3, img: '📓' }, { q: '◎すかあと', ans: 4, img: '👗' } ] },
+            // 文づくり
+            { id: 4, type: 'bun', title: '動物の声（中級）★★', inst: '動物のなき声をつかって、文をつくりましょう。',
+              data: [ { prompt: '「ワンワン」', img: '🐕' }, { prompt: '「ニャー」', img: '🐈' }, { prompt: '「モー」', img: '🐄' } ] },
+            { id: 5, type: 'bun', title: 'いろいろな音（中級）★★', inst: '音の言葉をつかって、文をつくりましょう。',
+              data: [ { prompt: '「ザーザー」', img: '☔' }, { prompt: '「ドンドン」', img: '🥁' }, { prompt: '「ブーブー」', img: '🚗' } ] },
+            { id: 6, type: 'grid', title: '外国の言葉（中級）★★', inst: '外国から来た言葉を かたかなで 書きましょう。',
+              data: [ { q: '①ぴあの', ans: 3, img: '🎹' }, { q: '②ぎたあ', ans: 3, img: '🎸' }, { q: '③ぱん', ans: 2, img: '🍞' }, { q: '④な いふ', ans: 3, img: '🍴' }, { q: '⑤ばす', ans: 2, img: '🚌' }, { q: '◎とれ いれ', ans: 4, img: '🚽' } ] },
+            { id: 7, type: 'bun', title: '文づくり①（上級）★★★', inst: '言葉をつかって 文をつくりましょう。',
+              data: [ { prompt: '「バス」', img: '🚌' }, { prompt: '「プール」', img: '🏊' }, { prompt: '「バナナ」', img: '🍌' } ] },
+            { id: 8, type: 'bun', title: '文づくり②（上級）★★★', inst: '言葉をつかって 文をつくりましょう。',
+              data: [ { prompt: '「アイス」', img: '🍨' }, { prompt: '「コップ」', img: '🥤' }, { prompt: '「ズボン」', img: '👖' } ] },
+            { id: 9, type: 'bun', title: '文づくり③（上級）★★★', inst: '言葉をつかって 文をつくりましょう。',
+              data: [ { prompt: '「ニュース」', img: '📺' }, { prompt: '「プレゼント」', img: '🎁' }, { prompt: '「ハンバーグ」', img: '🍖' } ] },
+            // 漢字
+            { id: 10, type: 'grid', title: '漢字（体）★★', inst: '体の部分の漢字を 書きましょう。',
+              data: [ { q: '①め', ans: 1, img: '👁️' }, { q: '②みみ', ans: 1, img: '👂' }, { q: '③くち', ans: 1, img: '👄' }, { q: '④て', ans: 1, img: '✋' }, { q: '⑤あし', ans: 1, img: '🦶' }, { q: '◎ちから', ans: 1, img: '💪' } ],
+              footer: [ '大きな <span class="masu-inline"></span> を あける。', '<span class="masu-inline"></span> を 高く あげる。', '<span class="masu-inline"></span> が はやい。' ] },
+            { id: 11, type: 'grid', title: '漢字（自然）★★', inst: '自然の漢字を 書きましょう。',
+              data: [ { q: '①ひ', ans: 1, img: '☀️' }, { q: '②つき', ans: 1, img: '🌙' }, { q: '③やま', ans: 1, img: '⛰️' }, { q: '④かわ', ans: 1, img: '🌊' }, { q: '⑤き', ans: 1, img: '🌳' }, { q: '◎はな', ans: 1, img: '🌷' } ],
+              footer: [ 'きれいな <span class="masu-inline"></span> が さく。', '<span class="masu-inline"></span> が ながれる。', '<span class="masu-inline"></span> に のぼる。' ] },
+            { id: 12, type: 'grid', title: '漢字（学校）★★', inst: '学校にあるものの漢字を 書きましょう。',
+              data: [ { q: '①ほん', ans: 1, img: '📖' }, { q: '②ぶん', ans: 1, img: '✏️' }, { q: '③くるま', ans: 1, img: '🚗' }, { q: '④むし', ans: 1, img: '🐞' }, { q: '⑤あか', ans: 1, img: '🔴' }, { q: '◎あお', ans: 1, img: '🔵' } ],
+              footer: [ '<span class="masu-inline"></span> を よむ。', '<span class="masu-inline"></span> に のる。', '<span class="masu-inline"></span> を つかまえる。' ] },
+            // 漢字文
+            { id: 13, type: 'bun', title: '漢字文づくり①（上級）★★★', inst: '漢字をつかって 文をつくりましょう。',
+              data: [ { prompt: '「山」', img: '⛰️' }, { prompt: '「川」', img: '🌊' }, { prompt: '「田」', img: '🌾' } ] },
+            { id: 14, type: 'bun', title: '漢字文づくり②（上級）★★★', inst: '漢字をつかって 文をつくりましょう。',
+              data: [ { prompt: '「口」', img: '👄' }, { prompt: '「手」', img: '✋' }, { prompt: '「目」', img: '👁️' } ] },
+            { id: 15, type: 'bun', title: '漢字文づくり③（上級）★★★', inst: '漢字をつかって 文をつくりましょう。',
+              data: [ { prompt: '「雨」', img: '☔' }, { prompt: '「天」', img: '🌤️' }, { prompt: '「気」', img: '😊' } ] },
+            // しりとり
+            { id: 16, type: 'shiritori', title: 'しりとり（初級）★', inst: 'えをみて しりとりを かんせいさせましょう。',
+              data: [ {s_img:'🍎', s_txt:'りんご', e_img:'🎺', e_txt:'らっぱ'}, {s_img:'🧢', s_txt:'ぼうし', e_img:'🌂', e_txt:'かさ'} ] },
+            { id: 17, type: 'shiritori', title: 'しりとり（中級）★★', inst: 'えをみて しりとりを しましょう。',
+              data: [ {s_img:'🍉', s_txt:'すいか', e_img:'👓', e_txt:'めがね'}, {s_img:'🐱', s_txt:'ねこ', e_img:'🛌', e_txt:'まくら'} ] },
+            { id: 18, type: 'shiritori', title: 'しりとり（上級）★★★', inst: 'えをみて しりとりを しましょう。',
+              data: [ {s_img:'✏️', s_txt:'えんぴつ', e_img:'🦊', e_txt:'きつね'}, {s_img:'⏰', s_txt:'とけい', e_img:'🍉', e_txt:'すいか'} ] },
+            // 間違い直し
+            { id: 19, type: 'error', title: 'まちがい直し①（初級）★', inst: 'まちがいを直して 正しく書きましょう。',
+              data: [ { q: 'こんばんわ', ans: 'こんばんは' }, { q: 'こんにちわ', ans: 'こんにちは' }, { q: 'おとおと', ans: 'おとうと' }, { q: 'せんせえ', ans: 'せんせい' } ] },
+            { id: 20, type: 'error', title: 'まちがい直し②（中級）★★', inst: 'のばす音に気をつけて 直しましょう。',
+              data: [ { q: 'おとおさん', ans: 'おとうさん' }, { q: 'こおえん', ans: 'こうえん' }, { q: 'とけえ', ans: 'とけい' }, { q: 'おねいさん', ans: 'おねえさん' } ] },
+            { id: 21, type: 'error', title: 'まちがい直し③（上級）★★★', inst: '「わ」と「は」、「お」と「を」に気をつけよう。',
+              data: [ { q: 'わたしわいく', ans: 'わたしは' }, { q: 'ほんおよむ', ans: 'ほんを' }, { q: 'うみえいく', ans: 'うみへ' }, { q: 'えおかく', ans: 'えを' } ] },
+            { id: 22, type: 'error', title: 'まちがい直し④（上級）★★★', inst: '小さい「っ」「ゃ」に気をつけよう。',
+              data: [ { q: 'らぱ', ans: 'らっぱ' }, { q: 'じゆう', ans: 'じゅう' }, { q: 'びよういん', ans: 'びょういん' }, { q: 'きつぷ', ans: 'きっぷ' } ] }
+        ];
+
+        function generateAllPages() {
+            const container = document.getElementById('sheets-container');
+            const selector = document.getElementById('pageSelector');
+            
+            pages.forEach((page, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.innerText = `第${page.id}回：${page.title}`;
+                selector.appendChild(opt);
+
+                const sheet = document.createElement('div');
+                sheet.className = 'sheet';
+                sheet.id = `sheet-${index}`;
+                if (index === 0) sheet.classList.add('active');
+
+                let contentHtml = '';
+                let contentClass = 'main-content';
+
+                if (page.type === 'grid') {
+                    if (page.footer) {
+                        contentClass += ' layout-grid-split';
+                        let upperHtml = '';
+                        page.data.forEach(item => {
+                            let masuHtml = '';
+                            for(let i=0; i<item.ans; i++) masuHtml += '<div class="masu"></div>';
+                            upperHtml += `<div class="grid-col"><div class="q-header">${item.q}</div><div class="masu-container">${masuHtml}</div><div class="illust">${item.img}</div></div>`;
+                        });
+                        let lowerHtml = '<div class="footer-label">□（かんじ）を かきましょう</div>';
+                        page.footer.forEach(qStr => { lowerHtml += `<div class="footer-question">${qStr}</div>`; });
+                        contentHtml = `<div class="grid-upper">${upperHtml}</div><div class="grid-lower">${lowerHtml}</div>`;
+                    } else {
+                        contentClass += ' layout-grid';
+                        page.data.forEach(item => {
+                            let masuHtml = '';
+                            for(let i=0; i<item.ans; i++) masuHtml += '<div class="masu"></div>';
+                            contentHtml += `<div class="grid-col"><div class="q-header">${item.q}</div><div class="masu-container">${masuHtml}</div><div class="illust">${item.img}</div></div>`;
+                        });
+                    }
+                } else if (page.type === 'bun') {
+                    contentClass += ' layout-bun';
+                    page.data.forEach(item => {
+                        let masuCols = '';
+                        for(let c=0; c<3; c++){
+                            let colMasu = '';
+                            for(let r=0; r<8; r++) colMasu += '<div class="masu-simple"></div>';
+                            masuCols += `<div class="bun-col">${colMasu}</div>`;
+                        }
+                        contentHtml += `<div class="bun-row"><div class="bun-header"><div class="bun-illust">${item.img}</div><div class="bun-prompt">${item.prompt}</div></div><div class="bun-masu-area">${masuCols}</div></div>`;
+                    });
+                } else if (page.type === 'shiritori') {
+                    contentClass += ' layout-shiritori';
+                    page.data.forEach(row => {
+                        contentHtml += `<div class="shiritori-row"><div class="shiritori-item"><div class="s-box">${row.s_img}</div><div class="s-text">${row.s_txt}</div></div><div class="s-arrow">➡</div><div class="shiritori-item"><div class="s-box s-empty"></div><div class="s-text">（　　　　　）</div></div><div class="s-arrow">➡</div><div class="shiritori-item"><div class="s-box">${row.e_img}</div><div class="s-text">${row.e_txt}</div></div></div>`;
+                    });
+                } else if (page.type === 'error') {
+                    contentClass += ' layout-error';
+                    page.data.forEach(item => {
+                        let masuHtml = '';
+                        // 答えの文字数分だけマスを生成
+                        for (let i = 0; i < item.ans.length; i++) {
+                            masuHtml += '<div class="masu-error"></div>';
+                        }
+                        contentHtml += `
+                            <div class="error-col">
+                                <div class="check-mark">×</div>
+                                <div class="error-sentence">${item.q}</div>
+                                <div class="s-arrow">⇩</div>
+                                <div class="error-masu-container">
+                                    ${masuHtml}
+                                </div>
+                            </div>`;
+                    });
+                }
+
+                sheet.innerHTML = `
+                    <div class="sidebar">
+                        <div class="title">${page.title}</div>
+                        <div class="name-box">（　　　）ねん（　　　）くみ<br><br>なまえ（　　　　　　　　　　）</div>
+                        <div class="instruction">${page.inst}</div>
+                        <div class="page-num">${page.id}</div>
+                    </div>
+                    <div class="${contentClass}">${contentHtml}</div>
+                `;
+                container.appendChild(sheet);
+            });
+        }
+
+        function switchView() {
+            const index = document.getElementById('pageSelector').value;
+            document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+            document.getElementById(`sheet-${index}`).classList.add('active');
+        }
+
+        window.onload = generateAllPages;
+    </script>
+</body>
+</html>
