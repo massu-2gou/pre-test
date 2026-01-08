@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>小学校国語_高学年_ドリル増量版</title>
+    <style>
+        /* --- 共通設定 --- */
+        @page { size: A4 landscape; margin: 0; }
+        body {
+            margin: 0; padding: 0;
+            background-color: #eee;
+            font-family: "UD Digi Kyokasho NK-R", "Yu Kyokasho", "BIZ UDPGothic", "Meiryo", sans-serif;
+            box-sizing: border-box;
+        }
+        
+        ruby { font-family: inherit; }
+        rt { font-size: 0.6em; }
+
+        .sheet {
+            width: 297mm; height: 210mm;
+            background-color: #fff;
+            padding: 10mm;
+            box-sizing: border-box;
+            display: none;
+            margin: 0 auto;
+            position: relative;
+            page-break-after: always;
+        }
+        .sheet.active { display: flex; }
+
+        /* --- 縦書きレイアウト --- */
+        .layout-vertical {
+            flex-direction: row-reverse; /* 右から左へ */
+        }
+        
+        /* サイドバー */
+        .sidebar-v {
+            flex: 0 0 7%; /* 少し狭く */
+            height: 100%;
+            border-left: 3px solid #333;
+            padding: 0 1mm;
+            box-sizing: border-box;
+            writing-mode: vertical-rl;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: space-between;
+        }
+        .v-header-title {
+            font-size: 14pt; font-weight: bold; letter-spacing: 0.1em; height: 100%; 
+            display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; 
+        }
+        .v-header-name {
+            font-size: 11pt; height: 100%; 
+            display: flex; align-items: center; justify-content: center;
+            border-right: 1px dashed #999;
+            padding-right: 2mm; margin-right: 2mm;
+            line-height: 1.2; 
+            white-space: nowrap; 
+        }
+
+        /* メインエリア */
+        .main-v {
+            width: 93%; height: 100%;
+            padding: 3mm 5mm; /* 上下余白を詰める */
+            box-sizing: border-box;
+            position: relative;
+            writing-mode: vertical-rl;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            gap: 3mm;
+        }
+
+        /* --- 共通パーツ --- */
+        .section-v {
+            flex-grow: 1;
+            display: flex; flex-direction: column;
+            border-left: 1px dashed #ccc; padding-left: 3mm; margin-left: 3mm;
+            justify-content: flex-start;
+        }
+        .section-v:first-child { border-left: none; padding-left: 0; margin-left: 0; }
+        .section-title { font-size: 12pt; font-weight: bold; margin-bottom: 2mm; line-height: 1.4; flex-shrink: 0; }
+
+        /* 一般問題リスト（高密度） */
+        .question-list {
+            display: flex; flex-direction: column; 
+            width: 100%;
+        }
+        .question-item { 
+            font-size: 11pt; line-height: 1.6; /* 文字サイズ調整 */
+            margin-left: 3mm; margin-bottom: 1.5mm;
+        }
+
+        /* 2列レイアウト（高密度） */
+        .two-columns-layout {
+            display: flex; 
+            flex-direction: row-reverse; 
+            justify-content: space-between;
+            height: 100%; width: 100%;
+        }
+        .column-pane {
+            width: 49%; height: 100%;
+            display: flex; flex-direction: column; 
+        }
+        .column-pane-left {
+            border-right: 1px dashed #999; padding-right: 3mm;
+        }
+
+        /* 漢字の成り立ち */
+        .origin-desc-box {
+            border: 1px solid #333; padding: 2mm; font-size: 9pt; margin-bottom: 2mm;
+            background: #f0f0f0; writing-mode: vertical-rl;
+        }
+        .origin-grid {
+            display: flex; flex-wrap: wrap; flex-direction: column; height: 100%; align-content: space-between;
+        }
+        .origin-item {
+            font-size: 13pt; display: flex; align-items: center; margin-bottom: 1mm; width: 48%;
+        }
+        .origin-box {
+            width: 10mm; height: 10mm; border: 1px solid #333; display: inline-block; vertical-align: middle; margin-top: 1mm;
+        }
+
+        /* 読解問題 */
+        .reading-container {
+            display: flex; flex-direction: column; height: 100%; width: 100%;
+        }
+        .reading-text {
+            height: 55%; width: 100%;
+            border: 1px solid #333; padding: 4mm;
+            font-size: 10.5pt; line-height: 1.7;
+            text-align: justify; margin-left: 3mm;
+            overflow: hidden;
+        }
+        .reading-questions {
+            height: 42%; width: 100%;
+            display: flex; flex-direction: column; justify-content: space-around;
+        }
+
+        /* 記述問題（原稿用紙風） */
+        .writing-lines {
+            width: 95%; height: 20mm; 
+            border: 1px solid #333; margin-left: 5mm; margin-top: 1mm;
+            background-image: repeating-linear-gradient(to left, transparent 0, transparent 9mm, #ccc 9mm, #ccc calc(9mm + 1px));
+        }
+
+        /* 和同開珎（十字パズル） */
+        .wado-grid-container {
+            display: flex; flex-wrap: wrap; 
+            flex-direction: row-reverse; 
+            justify-content: space-around; align-content: space-around;
+            height: 100%; width: 100%;
+        }
+        .wado-item {
+            width: 30%; height: 30%; /* 小さくして数を入れる */
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 1px;
+            font-size: 16pt; font-weight: bold;
+        }
+        .wado-cell {
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #333; aspect-ratio: 1 / 1;
+            background: #fff;
+        }
+        .wado-center { border: 3px double #000; background: #eee; }
+        .wado-hidden { border: none; background: transparent; }
+        .wado-num { position: absolute; top: -5mm; right: 0; font-size: 10pt; }
+
+        /* 操作パネル */
+        .control-panel {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: #333; color: #fff; padding: 15px;
+            z-index: 9999; display: flex; gap: 20px; align-items: center; justify-content: center;
+        }
+        select { font-size: 16px; padding: 8px; }
+        button { font-size: 16px; padding: 8px 20px; cursor: pointer; background: #4CAF50; color: #fff; border: none; font-weight: bold; }
+        .nav-btn { background-color: #2196F3; }
+        .nav-btn:hover { background-color: #0b7dda; }
+
+        @media print {
+            .control-panel { display: none !important; }
+            body, .sheet { background-color: #fff; margin: 0; }
+            .sheet { display: flex !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <label>高学年用ドリル:</label>
+        <select id="pageSelector" onchange="switchView()"></select>
+        <button onclick="window.print()">🖨️ 印刷する</button>
+        <button class="nav-btn" onclick="location.href='pre-test2.html'">⬅ 中学年用へ</button>
+    </div>
+
+    <div id="sheets-container"></div>
+
+    <script>
+        const pages = [
+            // P1
+            { 
+                id: 1, type: 'kanji-dense', title: '漢字の成り立ち・熟語', 
+                sections: [
+                    {
+                        title: '一、次の漢字の成り立ちをア～ウから選んで記号を書きましょう。',
+                        desc: 'ア：象形（物の形）　イ：指事（印や記号）　ウ：会意（意味の組み合わせ）',
+                        items: [
+                            '①日（　）', '②上（　）', '③休（　）', '④山（　）', 
+                            '⑤本（　）', '⑥森（　）', '⑦門（　）', '⑧鳴（　）',
+                            '⑨刀（　）', '⑩林（　）', '⑪三（　）', '⑫岩（　）',
+                            '⑬月（　）', '⑭末（　）'
+                        ]
+                    },
+                    {
+                        title: '二、次の漢字の「音を表す部分」を書きぬきましょう。',
+                        items: [
+                            '①粉（フン）→〔　　〕', '②銅（ドウ）→〔　　〕', '③格（カク）→〔　　〕',
+                            '④清（セイ）→〔　　〕', '⑤持（ジ）　→〔　　〕', '⑥囲（イ）　→〔　　〕',
+                            '⑦問（モン）→〔　　〕', '⑧河（カ）　→〔　　〕'
+                        ]
+                    },
+                    {
+                        title: '三、次の二字熟語の構成として正しいものを選びましょう。',
+                        desc: 'ア：似た意味　イ：反対の意味　ウ：主語と述語　エ：修飾・被修飾',
+                        items: [
+                            '①上下（　）', '②岩石（　）', '③日没（　）', '④洋画（　）',
+                            '⑤軽重（　）', '⑥切断（　）', '⑦雷鳴（　）', '⑧高山（　）',
+                            '⑨寒冷（　）', '⑩国営（　）'
+                        ]
+                    }
+                ]
+            },
+            // P2
+            { 
+                id: 2, type: 'standard', title: '熟語の構成（三字・四字）', 
+                sections: [
+                    {
+                        title: '一、次の三字熟語の構成をア～ウから選びましょう。',
+                        items: [
+                            'ア：上二字が下の字にかかる（無人-島）　イ：上一字が下の二字にかかる（未-解決）　ウ：対等の関係（衣・食・住）',
+                            '①不合格（　）', '②松竹梅（　）', '③専門家（　）', '④非常口（　）',
+                            '⑤雪月花（　）', '⑥無意識（　）', '⑦再出発（　）', '⑧放送局（　）'
+                        ]
+                    },
+                    {
+                        title: '二、次の（　）に漢字を入れて四字熟語を完成させましょう。',
+                        items: [
+                            '① 一（　）一会 ・・・一生に一度の出会い',
+                            '② 異（　）同音 ・・・みんなが同じことを言う',
+                            '③ 自（　）自得 ・・・自分の行いの報いを受ける',
+                            '④ 一（　）両得 ・・・一つのことで二つの利益を得る',
+                            '⑤ （　）肉（　）食 ・・・強い者が弱い者を犠牲にする',
+                            '⑥ 公（　）正大 ・・・隠さず堂々としていること',
+                            '⑦ 意（　）投合 ・・・互いの気持ちがぴったり合う'
+                        ]
+                    }
+                ]
+            },
+            // P3
+            { 
+                id: 3, type: 'split-2col', title: '敬語・言葉の分類', 
+                leftTitle: '一、次の文の（　）から正しい敬語を選んで○をつけましょう。',
+                leftItems: [
+                    '①先生が、教室に（ 来ました ・ いらっしゃいました ）。',
+                    '②母の質問に、校長先生が（ お答えになりました ・ 申されました ）。',
+                    '③社長がディナーを（ 食べる ・ めしあがる ）。',
+                    '④木村さんから、おみやげを（ もらった ・ いただいた ）。',
+                    '⑤明日、先生のお宅に（ うかがいます ・ 行きます ）。',
+                    '⑥お客様が（ 帰られました ・ 帰りました ）。',
+                    '⑦先生の作品を（ 見ました ・ 拝見しました ）。',
+                    '⑧私が荷物を（ 持ちます ・ お持ちします ）。'
+                ],
+                rightTitle: '二、言葉を和語・漢語・外来語に分けて書きましょう。<br><br>三、次の動詞の「尊敬語」と「謙譲語」を書きましょう。',
+                rightItems: [
+                    '【語群】 ふるさと、科学、ラッシュ、人、相当、予想、スピード、過ごす、多い、スイミング、帰省、スプーン',
+                    '和語：（　　　　）（　　　　）（　　　　）',
+                    '漢語：（　　　　）（　　　　）（　　　　）',
+                    '外来語：（　　　　）（　　　　）（　　　　）',
+                    '----',
+                    '① 言う　尊（　　　　）　謙（　　　　）',
+                    '② 行く　尊（　　　　）　謙（　　　　）',
+                    '③ 見る　尊（　　　　）　謙（　　　　）',
+                    '④ 食べる尊（　　　　）　謙（　　　　）'
+                ]
+            },
+            // P4
+            {
+                id: 4, type: 'kanji-usage', title: '同音異義語・打ち消しの語',
+                sections: [
+                    {
+                        title: '一、文脈に合う正しい漢字を選んで○をつけましょう。',
+                        items: [
+                            '①毎週水曜日に発売される（ 週刊 ・ 週汗 ）誌。',
+                            '②この海は、（ 干 ・ 満 ）の差が大きい。',
+                            '③（ 新幹 ・ 新肝 ）線で大阪まで行く。',
+                            '④（ 心臓 ・ 新蔵 ）の検査入院をする。',
+                            '⑤運動による発（ 汗 ・ 幹 ）で、水分が失われる。',
+                            '⑥五年ぶりに（ 故郷 ・ 古郷 ）に帰る。',
+                            '⑦（ 琵琶 ・ 比和 ）湖は日本一大きい。',
+                            '⑧（ 恩 ・ 音 ）返しに、はたを織る鶴。',
+                            '⑨（ 簡 ・ 単 ）潔にまとめて話す。',
+                            '⑩（ 汽 ・ 気 ）車に乗って旅に出る。'
+                        ]
+                    },
+                    {
+                        title: '二、次の語を打ち消す漢字（不・無・未・非）を入れて熟語を完成させましょう。',
+                        items: [
+                            '①（　　）器用　…器用ではない',
+                            '②（　　）十分　…十分ではない',
+                            '③（　　）開発　…まだ開発されていない',
+                            '④（　　）常口　…通常ではない出口',
+                            '⑤（　　）合格　…合格しないこと',
+                            '⑥（　　）気味　…気味（きもち）がわるい',
+                            '⑦（　　）決定　…まだ決まっていない',
+                            '⑧（　　）一文　…一文もお金がない',
+                            '⑨（　　）公式　…公式ではない',
+                            '⑩（　　）解決　…まだ解決していない'
+                        ]
+                    }
+                ]
+            },
+            // P5
+            {
+                id: 5, type: 'split-2col', title: '対義語・類義語',
+                leftTitle: '一、次の言葉の対義語（反対の意味）を書きましょう。',
+                leftItems: [
+                    '① 原因　⇔（　　　　）', '② 開始　⇔（　　　　）',
+                    '③ 賛成　⇔（　　　　）', '④ 利益　⇔（　　　　）',
+                    '⑤ 拡大　⇔（　　　　）', '⑥ 具体　⇔（　　　　）',
+                    '⑦ 権利　⇔（　　　　）', '⑧ 供給　⇔（　　　　）',
+                    '⑨ 肯定　⇔（　　　　）', '⑩ 集合　⇔（　　　　）',
+                    '⑪ 軽視　⇔（　　　　）', '⑫ 節約　⇔（　　　　）',
+                    '⑬ 往路　⇔（　　　　）', '⑭ 形式　⇔（　　　　）'
+                ],
+                rightTitle: '二、次の言葉の類義語（似た意味）を選びましょう。<br>三、対義語を使って短文を作りましょう。',
+                rightItems: [
+                    '【語群】 完了、希望、決心、苦情、発明、援助、節約、貢献、協力、変化',
+                    '① 終了　≒（　　　　）', '② 願望　≒（　　　　）',
+                    '③ 決意　≒（　　　　）', '④ 文句　≒（　　　　）',
+                    '⑤ 考案　≒（　　　　）', '⑥ 支援　≒（　　　　）',
+                    '⑦ 寄付　≒（　　　　）', '⑧ 共同　≒（　　　　）',
+                    '⑨ 省略　≒（　　　　）', '⑩ 移り変わり≒（　　　　）',
+                    '---',
+                    '例：【 入口 ・ 出口 】 入口から入り出口から出る。',
+                    '①【 出席 ・ 欠席 】<div style="border-bottom:1px solid #000; height:5mm;"></div>',
+                    '②【 成功 ・ 失敗 】<div style="border-bottom:1px solid #000; height:5mm;"></div>'
+                ]
+            },
+            // P6
+            {
+                id: 6, type: 'split-2col', title: '四字熟語・ことわざ',
+                leftTitle: '一、意味に合う四字熟語を語群から選んで書きましょう。',
+                leftItems: [
+                    '【語群】 一石二鳥、五里霧中、絶体絶命、公明正大、自業自得、一期一会、異口同音、晴耕雨読',
+                    '① 一つのことで二つの利益を得ること。→（　　　　　　）',
+                    '② どうしてよいか分からず迷うこと。　→（　　　　　　）',
+                    '③ 追い詰められて逃げられない状態。　→（　　　　　　）',
+                    '④ 自分の行いの報いを受けること。　　→（　　　　　　）',
+                    '⑤ 隠し事がなく堂々としていること。　→（　　　　　　）',
+                    '⑥ 大勢が同じことを言うこと。　　　　→（　　　　　　）',
+                    '⑦ 一生に一度の出会い。　　　　　　　→（　　　　　　）',
+                    '⑧ 自然の中で自由に暮らすこと。　　　→（　　　　　　）'
+                ],
+                rightTitle: '二、次のことわざ・慣用句を完成させましょう。',
+                rightItems: [
+                    '① 犬も歩けば（　　　）にあたる。',
+                    '② （　　　）の耳に念仏。',
+                    '③ 猿も（　　　）から落ちる。',
+                    '④ 石の上にも（　　　）年。',
+                    '⑤ （　　　）を小耳にはさむ。',
+                    '⑥ （　　　）が滑る。',
+                    '⑦ 鬼に（　　　）棒。',
+                    '⑧ （　　　）からぼたもち。',
+                    '⑨ 弘法にも（　　　）の誤り。',
+                    '⑩ 善は（　　　）げ。',
+                    '⑪ ちりも積もれば（　　　）となる。',
+                    '⑫ 早起きは（　　　）の得。'
+                ]
+            },
+            // P7
+            {
+                id: 7, type: 'split-2col', title: '文法（文の組み立て）',
+                leftTitle: '一、次の文の主語と述語を書きぬきましょう。',
+                leftItems: [
+                    '① 赤い車が、猛スピードで走り去った。<br>主（　　　　）述（　　　　　）',
+                    '② 私は、昨日買った本を読んだ。<br>主（　　　　）述（　　　　　）',
+                    '③ 校庭の桜が、きれいに咲いている。<br>主（　　　　）述（　　　　　）',
+                    '④ 遠くの山に、雪が積もっている。<br>主（　　　　）述（　　　　　）',
+                    '⑤ 兄が、公園でサッカーをする。<br>主（　　　　）述（　　　　　）'
+                ],
+                rightTitle: '二、次の（　）に適切な接続語を入れましょう。<br>三、次の文の（　）に修飾語を入れましょう。',
+                rightItems: [
+                    '① 雨が降った。（　　　）、遠足は中止になった。',
+                    '② 一生懸命走った。（　　　）、間に合わなかった。',
+                    '③ 彼は頭が良い。（　　　）、スポーツも万能だ。',
+                    '④ 好きな果物は多い。（　　　）、いちごが一番好きだ。',
+                    '⑤ 勉強をした。（　　　）、テストで良い点を取った。',
+                    '⑥ 寒い。（　　　）、コートを着る。',
+                    '【語群】しかし、だから、例えば、しかも、すると、そこで',
+                    '----',
+                    '① （　　　　）花が咲いた。',
+                    '② 弟が（　　　　）走る。',
+                    '③ （　　　　）空が広がっている。'
+                ]
+            },
+            // P8
+            {
+                id: 8, type: 'writing', title: '表現の言いかえ・状況に合わせた文',
+                sections: [
+                    {
+                        title: '一、次の話し言葉を、適切な書き言葉（文章語）に書きかえましょう。',
+                        items: [
+                            '① きのう、学校に行った。→（　　　　　　　　　　　）',
+                            '② ケータイを持ってない。→（　　　　　　　　　　　）',
+                            '③ 宿題をちゃんとやる。　→（　　　　　　　　　　　）',
+                            '④ いろんな本を読む。　　→（　　　　　　　　　　　）'
+                        ]
+                    },
+                    {
+                        title: '二、次の言葉を、より適切な表現に言いかえましょう。',
+                        items: [
+                            '① 兄は、足がすごく速い。→（　　　　　　　　　　　）',
+                            '② でかい家が建った。　　→（　　　　　　　　　　　）',
+                            '③ 給食がうまい。　　　　→（　　　　　　　　　　　）'
+                        ]
+                    },
+                    {
+                        title: '三、次の状況に合わせて、短い文を書きましょう。',
+                        items: [
+                            '① 友だちに誘われましたが、用事があるので断る時。<br><div class="writing-lines"></div>',
+                            '② 先生に、本を借りたいとお願いする時。<br><div class="writing-lines"></div>'
+                        ]
+                    }
+                ]
+            },
+            // P9
+            {
+                id: 9, type: 'split-2col', title: '漢字の読み（難読・特別）',
+                inst: '一、次の――線の漢字の読みを書きましょう。',
+                leftTitle: '', rightTitle: '',
+                leftItems: [
+                    '① <span style="text-decoration:underline;">最寄</span>りの駅。(　　　　)',
+                    '② <span style="text-decoration:underline;">梅雨</span>が明ける。(　　　　)',
+                    '③ <span style="text-decoration:underline;">砂利</span>道を歩く。(　　　　)',
+                    '④ <span style="text-decoration:underline;">吹雪</span>になる。(　　　　)',
+                    '⑤ <span style="text-decoration:underline;">小豆</span>をにる。(　　　　)',
+                    '⑥ <span style="text-decoration:underline;">笑顔</span>であいさつ。(　　　　)',
+                    '⑦ <span style="text-decoration:underline;">問屋</span>におろす。(　　　　)',
+                    '⑧ <span style="text-decoration:underline;">景色</span>が良い。(　　　　)',
+                    '⑨ <span style="text-decoration:underline;">紅葉</span>を見に行く。(　　　　)',
+                    '⑩ 神社を<span style="text-decoration:underline;">建立</span>する。(　　　　)',
+                    '⑪ <span style="text-decoration:underline;">行脚</span>に出る。(　　　　)',
+                    '⑫ <span style="text-decoration:underline;">因果</span>関係。(　　　　)',
+                    '⑬ <span style="text-decoration:underline;">会釈</span>をする。(　　　　)',
+                    '⑭ <span style="text-decoration:underline;">気配</span>を感じる。(　　　　)',
+                    '⑮ <span style="text-decoration:underline;">定規</span>を使う。(　　　　)'
+                ],
+                rightItems: [
+                    '⑯ <span style="text-decoration:underline;">相撲</span>をとる。(　　　　)',
+                    '⑰ <span style="text-decoration:underline;">足袋</span>をはく。(　　　　)',
+                    '⑱ <span style="text-decoration:underline;">浴衣</span>を着る。(　　　　)',
+                    '⑲ <span style="text-decoration:underline;">玄人</span>はだし。(　　　　)',
+                    '⑳ <span style="text-decoration:underline;">山車</span>が出る。(　　　　)',
+                    '㉑ <span style="text-decoration:underline;">境内</span>を歩く。(　　　　)',
+                    '㉒ <span style="text-decoration:underline;">海原</span>を行く。(　　　　)',
+                    '㉓ 計画を<span style="text-decoration:underline;">企</span>てる。(　　　　)',
+                    '㉔ 注文を<span style="text-decoration:underline;">承</span>る。(　　　　)',
+                    '㉕ 墓に<span style="text-decoration:underline;">参</span>る。(　　　　)',
+                    '㉖ <span style="text-decoration:underline;">快</span>い返事。(　　　　)',
+                    '㉗ <span style="text-decoration:underline;">潔</span>い態度。(　　　　)',
+                    '㉘ <span style="text-decoration:underline;">著</span>しい成長。(　　　　)',
+                    '㉙ <span style="text-decoration:underline;">強</span>ち間違いではない。(　　　　)',
+                    '㉚ 筆で<span style="text-decoration:underline;">記</span>す。(　　　　)'
+                ]
+            },
+            // P10
+            {
+                id: 10, type: 'split-2col', title: '漢字の書き（同訓異字）',
+                inst: '一、文脈に合う漢字を書きましょう。',
+                leftTitle: '', rightTitle: '',
+                leftItems: [
+                    '① 旗を（あ）げる。　→（　　　）',
+                    '② お金を（あ）げる。→（　　　）',
+                    '③ 全力を（あ）げる。→（　　　）',
+                    '④ 暑い（ひ）。　　　→（　　　）',
+                    '⑤ 記念の（ひ）。　　→（　　　）',
+                    '⑥ （ひ）の丸。　　　→（　　　）',
+                    '⑦ 辞書を（ひ）く。　→（　　　）',
+                    '⑧ 楽器を（ひ）く。　→（　　　）',
+                    '⑨ 車に（ひ）かれる。→（　　　）',
+                    '⑩ 風邪を（ひ）く。　→（　　　）',
+                    '⑪ （あたた）かい水。→（　　　）',
+                    '⑫ （あたた）かい日。→（　　　）'
+                ],
+                rightItems: [
+                    '⑬ （はや）い電車。　→（　　　）',
+                    '⑭ 朝（はや）く起きる。→（　　　）',
+                    '⑮ 気持ちが（かわ）る。→（　　　）',
+                    '⑯ 席を（かわ）る。　→（　　　）',
+                    '⑰ 家に（かえ）る。　→（　　　）',
+                    '⑱ 恩を（かえ）す。　→（　　　）',
+                    '⑲ （あつ）い本。　　→（　　　）',
+                    '⑳ （あつ）いお茶。　→（　　　）',
+                    '㉑ 鏡に（うつ）す。　→（　　　）',
+                    '㉒ 写真に（うつ）す。→（　　　）',
+                    '㉓ 国を（おさ）める。→（　　　）',
+                    '㉔ 税を（おさ）める。→（　　　）'
+                ]
+            },
+            // P11
+            {
+                id: 11, type: 'reading', title: '読解・物語文',
+                text: '　ずんずんろうかを進んで行きますと、今度は水色のペンキぬりの戸がありました。<br>「どうも変なうちだ。どうしてこんなにたくさん戸があるのだろう。」<br>「これはロシア式だ。寒いとこや山の中はみんなこうさ。」<br>　そして二人はその戸を開けようとしますと、上に黄色な字でこう書いてありました。<br>【当軒は注文の多い料理店ですから、どうかそこはご承知ください。】<br>「なかなかはやってるんだ。こんな山の中で。」<br>「そりゃあそうだ。見たまえ、東京の大きな料理屋だって大通りには少ないだろう。」<br>　二人は言いながら、その戸を開けました。すると、そのうら側に、<br>【注文はずいぶん多いでしょうが、どうかいちいちこらえてください。】<br>「これはぜんたいどういうんだ。」<br>　一人のしんしは顔をしかめました。<br>「うん、これはきっと、注文があまり多くて支度が間に合わないけれども、ごめん下さいとこういうことだ。」<br>「そうだろう。早くどこかへはいって、何かたべたいな。」<br>「僕もそう思う。」<br>（宮沢賢治「注文の多い料理店」より）',
+                questions: [
+                    '一、ろうかを進んでいくと、何がありましたか。八文字で書きぬきましょう。<br>答え：（　　　　　　　　）',
+                    '二、二人は、たくさん戸がついているのはなぜだと思っていますか。<br>答え：（　　　　　）だから。',
+                    '三、「当軒」とはどこのことですか。<br>答え：（　　　　　　　　）',
+                    '四、戸の裏側の文字を見て、二人は店の事情をどう推測しましたか。<br>答え：（　　　　　　　　　　　　　　　　　　　　）',
+                    '五、二人が一番望んでいることは何ですか。<br>答え：（　　　　　　　　　　　　　　　　　　　　）'
+                ]
+            },
+            // P12
+            {
+                id: 12, type: 'reading', title: '読解・説明文',
+                text: '　言葉は、氷山に似ている。水面に出ている部分はわずかだが、水面下には巨大な山が隠れている。私たちが口に出したり書いたりする言葉は、氷山の一角にすぎない。その背後には、膨大な知識や経験、感情、文化的な背景などが潜んでいる。<br>　例えば、「ありがとう」という一言にも、単なる感謝の気持ちだけでなく、相手への尊敬や親愛の情、あるいは申し訳なさなど、様々な意味が込められていることがある。また、同じ「ありがとう」でも、言い方や場面によって、全く異なるニュアンスを持つこともある。<br>　私たちは、言葉の表面的な意味だけでなく、その奥にある深い意味を読み取ろうと努力する必要がある。相手の言葉に耳を傾け、その背景にある思いを想像することで、より深いコミュニケーションが可能になるのだ。<br>　言葉を大切にすることは、心を大切にすることにつながる。私たちは、言葉という氷山を探検する冒険家のようなものなのかもしれない。',
+                questions: [
+                    '一、筆者は、言葉を何に例えていますか。<br>答え：（　　　　　）',
+                    '二、「水面に出ている部分」とは、言葉のどのような側面を表していますか。<br>答え：（　　　　　　　　　　　　　　）',
+                    '三、「ありがとう」という言葉には、どのような意味が込められていることがありますか。本文中から一つ抜き出しなさい。<br>答え：（　　　　　　　　　）',
+                    '四、より深いコミュニケーションを可能にするためには、どうすればよいと筆者は述べていますか。<br>答え：（　　　　　　　　　　　　　　　　　　　　）'
+                ]
+            },
+            // P13
+            {
+                id: 13, type: 'wado', title: '和同開珎（熟語パズル）',
+                inst: '一、真ん中の□に漢字を入れて、矢印の方向（上から下、左から右）に二字熟語ができるようにしましょう。',
+                puzzles: [
+                    { t: '安', b: '配', l: '中', r: '決' }, // 心
+                    { t: '歩', b: '具', l: '車', r: '水' }, // 道
+                    { t: '毎', b: '光', l: '来', r: '記' }, // 日
+                    { t: '大', b: '法', l: '苦', r: '術' }, // 手
+                    { t: '青', b: '下', l: '日', r: '中' }, // 空
+                    { t: '小', b: '引', l: '手', r: '道' }  // 水
+                ]
+            }
+        ];
+
+        function generateAllPages() {
+            const container = document.getElementById('sheets-container');
+            const selector = document.getElementById('pageSelector');
+
+            pages.forEach((page, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.innerText = `P${page.id}. ${page.title}`; 
+                selector.appendChild(opt);
+
+                const sheet = document.createElement('div');
+                sheet.className = 'sheet layout-vertical';
+                sheet.id = `sheet-${index}`;
+                if (index === 0) sheet.classList.add('active');
+                
+                // サイドバー
+                const sidebar = document.createElement('div');
+                sidebar.className = 'sidebar-v';
+                sidebar.innerHTML = `
+                    <div class="v-header-title">小学校 高学年 国語<br>${page.title}</div>
+                    <div class="v-header-name">（　　）年（　　）組<br><br>名前（　　　　　　　　　）</div>
+                `;
+                sheet.appendChild(sidebar);
+
+                const main = document.createElement('div');
+                main.className = 'main-v';
+
+                if (page.type === 'kanji-dense') {
+                    // セクションを均等に配置
+                    page.sections.forEach(sec => {
+                        const secDiv = document.createElement('div');
+                        secDiv.className = 'section-v';
+                        
+                        let html = `<div class="section-title">${sec.title}</div>`;
+                        if(sec.desc) html += `<div class="origin-desc-box">${sec.desc}</div>`;
+                        
+                        html += '<div class="origin-grid">';
+                        sec.items.forEach(item => {
+                            html += `<div class="origin-item">${item}</div>`;
+                        });
+                        html += '</div>';
+                        
+                        secDiv.innerHTML = html;
+                        main.appendChild(secDiv);
+                    });
+
+                } else if (page.type === 'standard') {
+                    page.sections.forEach(sec => {
+                        const secDiv = document.createElement('div');
+                        secDiv.className = 'section-v';
+                        secDiv.innerHTML = `<div class="section-title">${sec.title}</div>`;
+                        const list = document.createElement('div');
+                        list.className = 'question-list';
+                        sec.items.forEach(item => {
+                            list.innerHTML += `<div class="question-item">${item}</div>`;
+                        });
+                        secDiv.appendChild(list);
+                        main.appendChild(secDiv);
+                    });
+
+                } else if (page.type === 'split-2col') {
+                    const secDiv = document.createElement('div');
+                    secDiv.className = 'section-v';
+                    if(page.inst) secDiv.innerHTML = `<div class="section-title">${page.inst}</div>`;
+                    
+                    const splitContainer = document.createElement('div');
+                    splitContainer.className = 'two-columns-layout';
+                    
+                    // 右列
+                    const rightPane = document.createElement('div');
+                    rightPane.className = 'column-pane column-pane-left'; // 縦書きなので右が先
+                    if(page.leftTitle) rightPane.innerHTML += `<div class="section-title">${page.leftTitle}</div>`;
+                    page.leftItems.forEach(item => {
+                        rightPane.innerHTML += `<div class="question-item">${item}</div>`;
+                    });
+
+                    // 左列
+                    const leftPane = document.createElement('div');
+                    leftPane.className = 'column-pane';
+                    if(page.rightTitle) leftPane.innerHTML += `<div class="section-title">${page.rightTitle}</div>`;
+                    page.rightItems.forEach(item => {
+                        leftPane.innerHTML += `<div class="question-item">${item}</div>`;
+                    });
+
+                    splitContainer.appendChild(rightPane);
+                    splitContainer.appendChild(leftPane);
+                    
+                    secDiv.appendChild(splitContainer);
+                    main.appendChild(secDiv);
+
+                } else if (page.type === 'reading') {
+                    const sec = document.createElement('div');
+                    sec.className = 'section-v';
+                    const container = document.createElement('div');
+                    container.className = 'reading-container';
+                    
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'reading-text';
+                    textDiv.innerHTML = page.text;
+                    
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'reading-questions';
+                    page.questions.forEach(q => {
+                        qDiv.innerHTML += `<div class="question-item">${q}</div>`;
+                    });
+
+                    container.appendChild(textDiv);
+                    container.appendChild(qDiv);
+                    sec.appendChild(container);
+                    main.appendChild(sec);
+
+                } else if (page.type === 'writing') {
+                    page.sections.forEach(sec => {
+                        const secDiv = document.createElement('div');
+                        secDiv.className = 'section-v';
+                        secDiv.innerHTML = `<div class="section-title">${sec.title}</div>`;
+                        const list = document.createElement('div');
+                        list.className = 'question-list';
+                        sec.items.forEach(item => {
+                            list.innerHTML += `<div class="question-item">${item}</div>`;
+                        });
+                        secDiv.appendChild(list);
+                        main.appendChild(secDiv);
+                    });
+
+                } else if (page.type === 'kanji-usage') {
+                    page.sections.forEach(sec => {
+                        const secDiv = document.createElement('div');
+                        secDiv.className = 'section-v';
+                        secDiv.innerHTML = `<div class="section-title">${sec.title}</div>`;
+                        const list = document.createElement('div');
+                        list.className = 'two-columns-layout'; // 2列で表示
+                        
+                        // itemsを半分に分ける
+                        const half = Math.ceil(sec.items.length / 2);
+                        const rightItems = sec.items.slice(0, half);
+                        const leftItems = sec.items.slice(half);
+
+                        const rightCol = document.createElement('div');
+                        rightCol.className = 'column-pane column-pane-left';
+                        rightItems.forEach(i => rightCol.innerHTML += `<div class="question-item">${i}</div>`);
+
+                        const leftCol = document.createElement('div');
+                        leftCol.className = 'column-pane';
+                        leftItems.forEach(i => leftCol.innerHTML += `<div class="question-item">${i}</div>`);
+
+                        list.appendChild(rightCol);
+                        list.appendChild(leftCol);
+                        secDiv.appendChild(list);
+                        main.appendChild(secDiv);
+                    });
+
+                } else if (page.type === 'kanji-reading') {
+                    const secDiv = document.createElement('div');
+                    secDiv.className = 'section-v';
+                    secDiv.innerHTML = `<div class="section-title">${page.inst}</div>`;
+                    
+                    const list = document.createElement('div');
+                    list.className = 'two-columns-layout';
+                    
+                    const half = Math.ceil(page.items.length / 2);
+                    const rightItems = page.items.slice(0, half);
+                    const leftItems = page.items.slice(half);
+
+                    const rightCol = document.createElement('div');
+                    rightCol.className = 'column-pane column-pane-left';
+                    rightItems.forEach(i => rightCol.innerHTML += `<div class="question-item">${i} (　　)</div>`);
+
+                    const leftCol = document.createElement('div');
+                    leftCol.className = 'column-pane';
+                    leftItems.forEach(i => leftCol.innerHTML += `<div class="question-item">${i} (　　)</div>`);
+
+                    list.appendChild(rightCol);
+                    list.appendChild(leftCol);
+                    secDiv.appendChild(list);
+                    main.appendChild(secDiv);
+
+                } else if (page.type === 'wado') {
+                    const secDiv = document.createElement('div');
+                    secDiv.className = 'section-v';
+                    secDiv.innerHTML = `<div class="section-title">${page.inst}</div>`;
+                    
+                    const gridContainer = document.createElement('div');
+                    gridContainer.className = 'wado-grid-container';
+                    
+                    page.puzzles.forEach((p, idx) => {
+                        const item = document.createElement('div');
+                        item.className = 'wado-item';
+                        item.innerHTML = `
+                            <div class="wado-num">第${idx+1}問</div>
+                            <div class="wado-cell wado-hidden"></div>
+                            <div class="wado-cell">${p.t}</div>
+                            <div class="wado-cell wado-hidden"></div>
+                            <div class="wado-cell">${p.l}</div>
+                            <div class="wado-cell wado-center"></div>
+                            <div class="wado-cell">${p.r}</div>
+                            <div class="wado-cell wado-hidden"></div>
+                            <div class="wado-cell">${p.b}</div>
+                            <div class="wado-cell wado-hidden"></div>
+                        `;
+                        gridContainer.appendChild(item);
+                    });
+                    secDiv.appendChild(gridContainer);
+                    main.appendChild(secDiv);
+                }
+
+                sheet.appendChild(main);
+                container.appendChild(sheet);
+            });
+        }
+
+        function switchView() {
+            const index = document.getElementById('pageSelector').value;
+            document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+            document.getElementById(`sheet-${index}`).classList.add('active');
+        }
+
+        window.onload = generateAllPages;
+    </script>
+</body>
+</html>
