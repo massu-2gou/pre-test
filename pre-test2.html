@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>小学校国語_中学年_ドリル最終完全版</title>
+    <style>
+        /* --- 共通設定 --- */
+        @page { size: A4 landscape; margin: 0; }
+        body {
+            margin: 0; padding: 0;
+            background-color: #eee;
+            font-family: "UD Digi Kyokasho NK-R", "Yu Kyokasho", "BIZ UDPGothic", "Meiryo", sans-serif;
+            box-sizing: border-box;
+        }
+        
+        ruby { font-family: inherit; }
+        rt { font-size: 0.6em; }
+
+        .sheet {
+            width: 297mm; height: 210mm;
+            background-color: #fff;
+            padding: 10mm;
+            box-sizing: border-box;
+            display: none;
+            margin: 0 auto;
+            position: relative;
+            page-break-after: always;
+        }
+        .sheet.active { display: flex; }
+
+        /* --- 縦書きレイアウト --- */
+        .layout-vertical {
+            flex-direction: row-reverse; /* 右から左へ */
+        }
+        
+        /* サイドバー */
+        .sidebar-v {
+            flex: 0 0 10%; 
+            height: 100%;
+            border-left: 3px solid #333;
+            padding: 0 1mm;
+            box-sizing: border-box;
+            writing-mode: vertical-rl;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: space-between;
+        }
+        .v-header-title {
+            font-size: 16pt; font-weight: bold; letter-spacing: 0.1em; height: 100%; 
+            display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; 
+        }
+        .v-header-name {
+            font-size: 13pt; height: 100%; 
+            display: flex; align-items: center; justify-content: center;
+            border-right: 1px dashed #999;
+            padding-right: 2mm; margin-right: 2mm;
+            line-height: 1.2; 
+            white-space: nowrap; 
+        }
+
+        /* メインエリア */
+        .main-v {
+            width: 90%; height: 100%;
+            padding: 5mm;
+            box-sizing: border-box;
+            position: relative;
+            writing-mode: vertical-rl;
+            display: flex; flex-direction: column;
+            gap: 10mm;
+        }
+
+        /* --- 横書きレイアウト --- */
+        .layout-horizontal {
+            flex-direction: column;
+        }
+        .header-h {
+            width: 100%; height: 12%;
+            border-bottom: 3px solid #333;
+            display: flex; flex-direction: row; 
+            justify-content: space-between; align-items: center;
+            padding: 0 10mm; box-sizing: border-box;
+        }
+        .h-header-title { font-size: 18pt; font-weight: bold; }
+        .h-header-name { font-size: 14pt; width: 40%; border-bottom: 1px solid #000; text-align: center; }
+
+        .main-h {
+            width: 100%; height: 88%;
+            padding: 10mm;
+            box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: flex-start;
+        }
+
+        /* --- 共通パーツ --- */
+        .section-v {
+            flex-grow: 1;
+            display: flex; flex-direction: column;
+            border-left: 1px dashed #ccc; padding-left: 5mm; margin-left: 5mm;
+        }
+        .section-v:first-child { border-left: none; padding-left: 0; margin-left: 0; }
+        .section-title { font-size: 14pt; font-weight: bold; margin-bottom: 5mm; line-height: 1.8; }
+
+        .kotowaza-item { margin-left: 5mm; font-size: 14pt; line-height: 2.2; flex-grow: 1; }
+        .kw-choice { border: 2px solid #333; padding: 2px 8px; border-radius: 12px; margin: 2px; display: inline-block;}
+
+        .meaning-box {
+            width: 90%; height: 100%; min-height: 50mm;
+            border: 2px solid #333; margin-left: 5mm; padding: 3mm; font-size: 13pt;
+            writing-mode: vertical-rl; flex-grow: 1; 
+        }
+        .write-line-v { border-left: 2px solid #333; margin-left: 10mm; margin-right: 5mm; flex-grow: 1; }
+
+        .romaji-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .romaji-item { width: 48%; margin-bottom: 10px; display: flex; align-items: center; }
+        .romaji-q { font-size: 14pt; width: 130px; }
+        .romaji-line { flex-grow: 1; height: 35px; border-bottom: 2px solid #333; position: relative; }
+        .romaji-line::before { content: ""; position: absolute; top: 33%; width: 100%; border-top: 1px dashed #999; }
+        .romaji-line::after { content: ""; position: absolute; top: 66%; width: 100%; border-top: 1px dashed #999; }
+
+        /* --- 漢字の組み立て（2段レイアウト） --- */
+        .kanji-new-layout {
+            display: flex;
+            flex-direction: row-reverse; 
+            height: 100%; width: 100%;
+            justify-content: space-between;
+        }
+        .kanji-new-col {
+            width: 48%; 
+            display: flex;
+            flex-direction: column; 
+            justify-content: space-around; 
+            height: 100%;
+        }
+        .kanji-new-item {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;    
+            justify-content: center;
+            font-size: 16pt;
+            height: 25%; 
+            border-bottom: 1px dashed #eee;
+        }
+        .kanji-new-text {
+            margin-bottom: 3mm; 
+            writing-mode: vertical-rl;
+        }
+        .kanji-new-box {
+            width: 25mm; height: 25mm;
+            border: 2px solid #333;
+            background: #fff;
+        }
+
+        /* --- 【NEW】作文画像再現レイアウト (Pages 11-12) --- */
+        .sakubun-image-layout {
+            display: flex;
+            flex-direction: row-reverse; /* 右エリア・左エリア */
+            justify-content: space-between;
+            height: 100%; width: 100%;
+            padding: 0; box-sizing: border-box;
+        }
+
+        /* 右エリア（メモ＋説明） */
+        .sil-right-pane {
+            width: 53%; /* 画面右側 */
+            height: 100%;
+            display: flex;
+            flex-direction: column; /* 上下に配置 */
+            justify-content: space-between;
+        }
+
+        /* メモ欄コンテナ（上部） */
+        .sil-memo-container {
+            height: 60%; /* 上部60% */
+            width: 100%;
+            display: flex;
+            flex-direction: row-reverse; /* 項目を右から左へ */
+            justify-content: space-between;
+        }
+
+        /* メモの柱（縦長） */
+        .sil-memo-col {
+            width: 18%; /* 項目数に応じて調整 */
+            height: 100%;
+            border: 2px solid #333; /* 枠線 */
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        .sil-memo-label {
+            height: 20%; /* 見出し部分 */
+            border-bottom: 2px solid #333;
+            background-color: #eee;
+            display: flex;
+            align-items: center; justify-content: center;
+            writing-mode: vertical-rl;
+            font-weight: bold; font-size: 12pt;
+        }
+
+        .sil-memo-input {
+            height: 80%; /* 記入欄 */
+            background-color: #fff;
+        }
+
+        /* 説明・例文ボックス（右下） */
+        .sil-example-box {
+            height: 35%; /* 下部35% */
+            width: 100%;
+            border: 2px solid #333;
+            padding: 5mm;
+            box-sizing: border-box;
+            writing-mode: vertical-rl;
+            font-size: 13pt;
+            line-height: 1.8;
+            position: relative;
+        }
+        .sil-example-title {
+            font-weight: bold; text-decoration: underline; margin-left: 5px;
+        }
+
+        /* 左エリア（作文用紙） */
+        .sil-left-pane {
+            width: 45%; /* 画面左側 */
+            height: 100%;
+            border: 2px solid #333; /* 外枠 */
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row-reverse; /* 右から左へ行を作成 */
+        }
+
+        /* 縦書きの行（点線区切り） */
+        .sil-genko-col {
+            flex: 1; /* 均等分割 */
+            border-left: 1px dashed #333; /* 点線 */
+            box-sizing: border-box;
+        }
+        /* 左端の線は不要 */
+        .sil-genko-col:last-child {
+            border-left: none;
+        }
+
+
+        /* --- お話作りレイアウト (Page 13) 左右分割維持 --- */
+        .story-layout-wrapper {
+            display: flex; flex-direction: column;
+            height: 100%; width: 100%;
+            justify-content: space-between;
+        }
+        .story-section {
+            width: 48%; 
+            height: 100%;
+            border: 1px dashed #999;
+            padding: 3mm;
+            display: flex; flex-direction: column; 
+            box-sizing: border-box;
+        }
+        .story-header {
+            height: 40%;
+            border-bottom: 2px solid #333; 
+            border-left: 2px solid #333; 
+            margin-left: 3mm; padding-left: 3mm;
+            display: flex; flex-direction: column;
+            justify-content: flex-start;
+        }
+        .story-instruction { font-size: 14pt; margin-bottom: 5mm; }
+        .story-word-list {
+            font-size: 16pt; font-weight: bold;
+            border: 2px solid #333; padding: 5mm;
+            background: #fff;
+            align-self: center; 
+            display: flex; flex-direction: column; gap: 5mm;
+        }
+        .story-genko {
+            flex-grow: 1; 
+            margin-top: 5mm; 
+            border: 2px solid #333;
+            position: relative;
+        }
+        .story-genko-lines {
+            width: 100%; height: 100%;
+            background-image: repeating-linear-gradient(
+                to left,
+                transparent 0,
+                transparent calc(16% - 1px),
+                #ccc calc(16% - 1px),
+                #ccc 16%
+            );
+        }
+
+        .target-word { text-decoration: none; border-right: 2px solid #000; padding-right: 2px; margin-right: 2px; }
+        .match-container { display: flex; flex-direction: column; justify-content: space-around; height: 100%; padding: 5mm 0; }
+        .match-item { font-size: 16pt; display: flex; align-items: center; margin-left: 10mm; }
+        .dic-sort-q { font-size: 16pt; margin-bottom: 10mm; margin-left: 10mm; line-height: 2; }
+        .grammar-q { font-size: 18pt; margin-left: 10mm; line-height: 3; margin-bottom: 5mm; }
+
+        .control-panel {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: #333; color: #fff; padding: 15px;
+            z-index: 9999; display: flex; gap: 20px; align-items: center; justify-content: center;
+        }
+        select { font-size: 16px; padding: 8px; }
+        button { font-size: 16px; padding: 8px 20px; cursor: pointer; background: #4CAF50; color: #fff; border: none; font-weight: bold; }
+        .nav-btn { background-color: #2196F3; }
+        .nav-btn:hover { background-color: #0b7dda; }
+        
+        @media print {
+            .control-panel { display: none !important; }
+            body, .sheet { background-color: #fff; margin: 0; }
+            .sheet { display: flex !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <label>中学年用ドリル:</label>
+        <select id="pageSelector" onchange="switchView()"></select>
+        <button onclick="window.print()">🖨️ 印刷する</button>
+        <button class="nav-btn" onclick="location.href='pre-test1.html'">⬅ 低学年用へ</button>
+        <button class="nav-btn" onclick="location.href='pre-test3.html'">➡ 高学年用へ</button>
+    </div>
+
+    <div id="sheets-container"></div>
+
+    <script>
+        const pages = [
+            // 既存ページ 1-10
+            { id: 1, type: 'kotowaza', layout: 'vertical', title: 'ことわざの練習①', 
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の（　　　）の<ruby>中<rt>なか</rt></ruby>から<ruby>正<rt>ただ</rt></ruby>しいほうを<ruby>選<rt>えら</rt></ruby>んで、○をつけましょう。',
+                  items: [ 'ねこに （ しんじゅ ・ 小ばん ）', '（ さる ・ <ruby>鳥<rt>とり</rt></ruby> ）も 木から<ruby>落<rt>お</rt></ruby>ちる', '<ruby>頭<rt>あたま</rt></ruby>かくして （ しり ・ <ruby>足<rt>あし</rt></ruby> ）かくさず', '<ruby>急<rt>いそ</rt></ruby>がば （ <ruby>走<rt>はし</rt></ruby>れ ・ <ruby>回<rt>まわ</rt></ruby>れ ）', 'かっぱの川 （ <ruby>流<rt>なが</rt></ruby>れ ・ <ruby>泳<rt>およ</rt></ruby>ぎ ）', '（ 二階 ・ 天 ）から <ruby>目薬<rt>めぐすり</rt></ruby>', '<ruby>泣<rt>な</rt></ruby>きっ<ruby>面<rt>つら</rt></ruby>に （ 蚊 ・ 蜂 ）', '<ruby>石<rt>いし</rt></ruby>の<ruby>上<rt>うえ</rt></ruby>にも （ 三年 ・ 十年 ）', '花より （ まんじゅう ・ だんご ）' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>のことわざの<ruby>意味<rt>いみ</rt></ruby>を<ruby>国語辞典<rt>こくごじてん</rt></ruby>で<ruby>調<rt>しら</rt></ruby>べて<ruby>書<rt>か</rt></ruby>きましょう。',
+                  items: [ '<ruby>失敗<rt>しっぱい</rt></ruby>は<ruby>成功<rt>せいこう</rt></ruby>のもと：', '<ruby>早起<rt>はやお</rt></ruby>きは<ruby>三文<rt>さんもん</rt></ruby>の<ruby>徳<rt>とく</rt></ruby>：' ], isMeaning: true }
+              ]
+            },
+            { id: 2, type: 'kotowaza', layout: 'vertical', title: 'ことわざの練習②', 
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の（　　　）の<ruby>中<rt>なか</rt></ruby>から<ruby>正<rt>ただ</rt></ruby>しいほうを<ruby>選<rt>えら</rt></ruby>んで、○をつけましょう。',
+                  items: [ '<ruby>馬<rt>うま</rt></ruby>の<ruby>耳<rt>みみ</rt></ruby>に （ ねん<ruby>仏<rt>ぶつ</rt></ruby> ・ お<ruby>経<rt>きょう</rt></ruby> ）', '<ruby>石橋<rt>いしばし</rt></ruby>を （ たたいて ・ ゆっくり ）わたる', 'たなから （ おはぎ ・ ぼたもち ）', '（ <ruby>薬<rt>くすり</rt></ruby> ・ <ruby>良薬<rt>りょうやく</rt></ruby> ）は <ruby>口<rt>くち</rt></ruby>に<ruby>苦<rt>にが</rt></ruby>し', '（ 一 ・ <ruby>話<rt>はなし</rt></ruby> ）を<ruby>聞<rt>き</rt></ruby>いて 十を<ruby>知<rt>し</rt></ruby>る', 'やけ<ruby>石<rt>いし</rt></ruby>に （ お<ruby>湯<rt>ゆ</rt></ruby> ・ <ruby>水<rt>みず</rt></ruby> ）', 'わたりに （ ふね ・ <ruby>橋<rt>はし</rt></ruby> ）', '（ <ruby>火<rt>ひ</rt></ruby> ・ なべ ）に <ruby>油<rt>あぶら</rt></ruby>をそそぐ', 'ぬかに （ ねじ ・ くぎ ）' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>のことわざの<ruby>意味<rt>いみ</rt></ruby>を<ruby>国語辞典<rt>こくごじてん</rt></ruby>で<ruby>調<rt>しら</rt></ruby>べて<ruby>書<rt>か</rt></ruby>きましょう。',
+                  items: [ 'なさけは<ruby>人<rt>ひと</rt></ruby>のためならず：', 'ちりもつもれば<ruby>山<rt>やま</rt></ruby>となる：' ], isMeaning: true }
+              ]
+            },
+            { id: 3, type: 'romaji', layout: 'horizontal', title: 'ローマ字の練習①',
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の<ruby>言葉<rt>ことば</rt></ruby>をローマ<ruby>字<rt>じ</rt></ruby>で<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '(1) こめ', '(2) りか', '(3) わに', '(4) あじ', '(5) らくだ', '(6) はさみ', '(7) ゴリラ', '(8) パソコン', '(9) ふでばこ', '(10) ブラウス', '(11) トマト', '(12) ノート' ] },
+                { inst: '二、<ruby>自分<rt>じぶん</rt></ruby>の<ruby>名前<rt>なまえ</rt></ruby>と、<ruby>学校<rt>がっこう</rt></ruby>の<ruby>名前<rt>なまえ</rt></ruby>をローマ<ruby>字<rt>じ</rt></ruby>で<ruby>書<rt>か</rt></ruby>きましょう。', items: ['なまえ', 'がっこう'] }
+              ]
+            },
+            { id: 4, type: 'romaji', layout: 'horizontal', title: 'ローマ字の練習②',
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の<ruby>言葉<rt>ことば</rt></ruby>をローマ<ruby>字<rt>じ</rt></ruby>で<ruby>書<rt>か</rt></ruby>きましょう。（<ruby>小<rt>ちい</rt></ruby>さい「ゃ・ゅ・ょ・っ」に<ruby>気<rt>き</rt></ruby>をつけよう）', items: [ '(1) にっき', '(2) きって', '(3) サッカー', '(4) あさって', '(5) がっこう', '(6) おちゃ', '(7) きしゃ', '(8) きょう', '(9) しゃかい', '(10) ぎゅうにゅう', '(11) じしょ', '(12) ちょきん' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>のローマ<ruby>字<rt>じ</rt></ruby>をひらがになおしましょう。', items: [ '(1) ohayo', '(2) kinoko' ] }
+              ]
+            },
+            { id: 5, type: 'romaji', layout: 'horizontal', title: 'ローマ字の練習③',
+              sections: [
+                { inst: '一、ローマ<ruby>字<rt>じ</rt></ruby>でしりとりをしましょう。', items: [ 'START (ka) -> (1)', '(1) -> (2)', '(2) -> (3)', '(3) -> (4)', '(4) -> (5)', '(5) -> (6)', '(6) -> (7)', '(7) -> (8)', '(8) -> (9)', '(9) -> (10)' ] }
+              ]
+            },
+            { id: 6, type: 'kotowaza', layout: 'vertical', title: '慣用句の練習①',
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の（　　　）に<ruby>合<rt>あ</rt></ruby>う<ruby>体<rt>からだ</rt></ruby>の<ruby>部分<rt>ぶぶん</rt></ruby>を<ruby>入<rt>い</rt></ruby>れましょう。（<ruby>目<rt>め</rt></ruby>、<ruby>耳<rt>みみ</rt></ruby>、<ruby>口<rt>くち</rt></ruby>、<ruby>鼻<rt>はな</rt></ruby>、<ruby>手<rt>て</rt></ruby>、<ruby>足<rt>あし</rt></ruby>、<ruby>顔<rt>かお</rt></ruby>、<ruby>歯<rt>は</rt></ruby>）', items: [ '（　　）がたたない　…かなわない', '（　　）が<ruby>高<rt>たか</rt></ruby>い　…じまんに<ruby>思<rt>おも</rt></ruby>う', '（　　）をかす　…<ruby>手伝<rt>てつだ</rt></ruby>う', '（　　）が<ruby>広<rt>ひろ</rt></ruby>い　…<ruby>知<rt>し</rt></ruby>り<ruby>合<rt>あ</rt></ruby>いが<ruby>多<rt>おお</rt></ruby>い', '（　　）をつぐむ　…だまってしまう', '（　　）がいたい　…<ruby>弱点<rt>じゃくてん</rt></ruby>をつかれてつらい', '（　　）を<ruby>運<rt>はこ</rt></ruby>ぶ　…わざわざ<ruby>出<rt>で</rt></ruby>かける', '（　　）を<ruby>落<rt>お</rt></ruby>とす　…がっかりする' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>の<ruby>慣用句<rt>かんようく</rt></ruby>を<ruby>使<rt>つか</rt></ruby>って<ruby>短<rt>みじか</rt></ruby>い<ruby>文<rt>ぶん</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましょう。', items: [ '<ruby>足<rt>あし</rt></ruby>がぼうになる：', '<ruby>耳<rt>みみ</rt></ruby>をうたがう：' ], isMeaning: true }
+              ]
+            },
+            { id: 7, type: 'kotowaza', layout: 'vertical', title: '慣用句の練習②',
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の（　　　）に<ruby>合<rt>あ</rt></ruby>う<ruby>言葉<rt>ことば</rt></ruby>を<ruby>入<rt>い</rt></ruby>れましょう。（<ruby>油<rt>あぶら</rt></ruby>、<ruby>売<rt>う</rt></ruby>り、<ruby>息<rt>いき</rt></ruby>、うり、<ruby>馬<rt>うま</rt></ruby>、さじ、ねこ）', items: [ '（　　）を<ruby>売<rt>う</rt></ruby>る　…むだ<ruby>話<rt>ばなし</rt></ruby>をする', '（　　）をのむ　…おどろく', '<ruby>話<rt>はなし</rt></ruby>に（　　）がさく　…<ruby>会話<rt>かいわ</rt></ruby>がはずむ', 'あとの（　　）　…<ruby>手<rt>て</rt></ruby>おくれ', '（　　）を<ruby>食<rt>く</rt></ruby>う　…むだな<ruby>時間<rt>じかん</rt></ruby>を<ruby>使<rt>つか</rt></ruby>う', '（　　）が<ruby>合<rt>あ</rt></ruby>う　…<ruby>気<rt>き</rt></ruby>が<ruby>合<rt>あ</rt></ruby>う', '（　　）<ruby>二<rt>ふた</rt></ruby>つ　…よくにている', '（　　）をつかむ　…とらえどころがない' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>の<ruby>慣用句<rt>かんようく</rt></ruby>を<ruby>使<rt>つか</rt></ruby>って<ruby>短<rt>みじか</rt></ruby>い<ruby>文<rt>ぶん</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましょう。', items: [ 'ねこの<ruby>手<rt>て</rt></ruby>もかりたい：', '<ruby>道草<rt>みちくさ</rt></ruby>を<ruby>食<rt>く</rt></ruby>う：' ], isMeaning: true }
+              ]
+            },
+            { id: 8, type: 'kanji', layout: 'vertical', title: '漢字の組み立て①',
+              sections: [
+                { inst: '一、<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせて、<ruby>元<rt>もと</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましょう。', isKanjiNew: true,
+                  items: [ '火 ＋ 田 ＝', '糸 ＋ 東 ＝', '口 ＋ 口 ＝', '金 ＋ 失 ＝', '日 ＋ 立 ＋ 日 ＝', '日 ＋ 刀 ＝', '立 ＋ 木 ＋ 見 ＝', '十 ＋ 十 ＋ 十 ＋ 月 ＝' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>のパーツを<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせてできる<ruby>漢字<rt>かんじ</rt></ruby>を２つ<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '（日、立、反、音）→', '（言、舌、吾、五）→' ], isMeaning: true }
+              ]
+            },
+            { id: 9, type: 'kanji', layout: 'vertical', title: '漢字の組み立て②',
+              sections: [
+                { inst: '一、<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせて、<ruby>元<rt>もと</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましょう。', isKanjiNew: true,
+                  items: [ '主 ＋ 木 ＝', '言 ＋ 寺 ＝', '口 ＋ 貝 ＝', '口 ＋ 門 ＝', 'ノ ＋ 土 ＋ 日 ＝', '口 ＋ 女 ＋ ム ＝', '目 ＋ 木 ＋ 心 ＝', '月 ＋ 一 ＋ ノ ＝' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>のパーツを<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせてできる<ruby>漢字<rt>かんじ</rt></ruby>を２つ<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '（日、寺、寸、土）→', '（心、亡、必、目）→' ], isMeaning: true }
+              ]
+            },
+            { id: 10, type: 'kanji', layout: 'vertical', title: '漢字辞典の使い方',
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の<ruby>場合<rt>ばあい</rt></ruby>は、どの<ruby>引<rt>ひ</rt></ruby>き<ruby>方<rt>かた</rt></ruby>で<ruby>引<rt>ひ</rt></ruby>きますか。<ruby>線<rt>せん</rt></ruby>で<ruby>結<rt>むす</rt></ruby>びましょう。', items: [ '<div class="match-container"><div class="match-item">へんやつくりが<ruby>分<rt>わ</rt></ruby>かっている<ruby>時<rt>とき</rt></ruby>　・</div><div class="match-item"><ruby>漢字<rt>かんじ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>みが<ruby>分<rt>わ</rt></ruby>かっている<ruby>時<rt>とき</rt></ruby>　・</div><div class="match-item"><ruby>漢字<rt>かんじ</rt></ruby>の<ruby>画数<rt>かくすう</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かっている<ruby>時<rt>とき</rt></ruby>　・</div></div>' + '<div class="match-container"><div class="match-item">・　<ruby>総画<rt>そうかく</rt></ruby>さく<ruby>引<rt>いん</rt></ruby></div><div class="match-item">・　<ruby>音訓<rt>おんくん</rt></ruby>さく<ruby>引<rt>いん</rt></ruby></div><div class="match-item">・　<ruby>部首<rt>ぶしゅ</rt></ruby>さく<ruby>引<rt>いん</rt></ruby></div></div>' ], isMatch: true },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>はどの<ruby>方法<rt>ほうほう</rt></ruby>で<ruby>引<rt>ひ</rt></ruby>きますか。（ア：<ruby>部首<rt>ぶしゅ</rt></ruby>　イ：<ruby>音訓<rt>おんくん</rt></ruby>　ウ：<ruby>総画<rt>そうかく</rt></ruby>）', items: [ '「薬」（くさかんむり）→ （　　　）', '「顔」（かお）→ （　　　）', '「凸」（画数）→ （　　　）' ] },
+                { inst: '三、「帰」という<ruby>字<rt>じ</rt></ruby>を<ruby>辞典<rt>じてん</rt></ruby>で<ruby>引<rt>ひ</rt></ruby>き、<ruby>意味<rt>いみ</rt></ruby>を<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '意味：' ], isMeaning: true }
+              ]
+            },
+            // ■ 11. 5W1H作文（画像再現レイアウト）
+            { id: 11, type: 'sakubun-image', layout: 'vertical', title: '5W1H 作文練習',
+              sections: [
+                { inst: '一、<ruby>最近<rt>さいきん</rt></ruby>したことを<ruby>思<rt>おも</rt></ruby>い<ruby>出<rt>だ</rt></ruby>してメモをし、それをもとに<ruby>文<rt>ぶん</rt></ruby>を<ruby>書<rt>か</rt></ruby>きましょう。',
+                  table: [ { l: 'いつ', h: '' }, { l: 'どこで', h: '' }, { l: 'だれが', h: '' }, { l: 'なにを', h: '' }, { l: 'かんそう', h: '' } ],
+                  desc: '<span class="si-example-title">れい</span><br>日曜日に、<br>公園で、<br>友だちと、<br>サッカーをしました。<br><br>とても楽しかったです。<br>またやりたいです。' }
+              ]
+            },
+            // ■ 12. 自己紹介（画像再現レイアウト）
+            { id: 12, type: 'sakubun-image', layout: 'vertical', title: '自己紹介文',
+              sections: [
+                { inst: '一、<ruby>自分<rt>じぶん</rt></ruby>のことをしょうかいするメモを<ruby>書<rt>か</rt></ruby>きましょう。',
+                  table: [ { l: 'なまえ', h: '' }, { l: 'すきなこと', h: '' }, { l: 'とくいなこと', h: '' }, { l: 'ひとこと', h: '' } ],
+                  desc: '<span class="si-example-title">れい</span><br>わたしの名前は<br>埼玉花子です。<br><br>好きなことは<br>読書です。<br>とくいなことは<br>なわとびです。<br><br>よろしくおねがいします。' }
+              ]
+            },
+            // ■ 13. お話作り（完全版）
+            { id: 13, type: 'story', layout: 'vertical', title: 'お話作り（条件作文）',
+              questions: [
+                  { 
+                      title: '一、<ruby>次<rt>つぎ</rt></ruby>の３つの<ruby>言葉<rt>ことば</rt></ruby>をすべて<ruby>使<rt>つか</rt></ruby>って、お<ruby>話<rt>はなし</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましょう。',
+                      words: ['ことば１　お弁当', 'ことば２　運動', 'ことば３　行進']
+                  },
+                  {
+                      title: '二、<ruby>次<rt>つぎ</rt></ruby>の３つの<ruby>言葉<rt>ことば</rt></ruby>もすべて<ruby>使<rt>つか</rt></ruby>って、<ruby>別<rt>べつ</rt></ruby>のお<ruby>話<rt>はなし</rt></ruby>を<ruby>考<rt>かんが</rt></ruby>えましょう。',
+                      words: ['ことば１　家族', 'ことば２　料理', 'ことば３　魚つり']
+                  }
+              ]
+            },
+            // 14以降
+            { id: 14, type: 'dic', layout: 'vertical', title: '国語辞典の使い方①',
+              sections: [
+                { inst: '一、<ruby>国語辞典<rt>こくごじてん</rt></ruby>で<ruby>先<rt>さき</rt></ruby>に<ruby>出<rt>で</rt></ruby>てくる<ruby>言葉<rt>ことば</rt></ruby>に○をつけましょう。', items: [ '（　　）たいいく　（　　）りか', '（　　）ひろい　　（　　）ふかい', '（　　）きつね　　（　　）きって', '（　　）じゆう　　（　　）じゅう', '（　　）しんくう　（　　）しんぐ', '（　　）スタンド　（　　）スタンプ', '（　　）だいだ　　（　　）だいだい' ] },
+                { inst: '二、――<ruby>線<rt>せん</rt></ruby>の<ruby>言葉<rt>ことば</rt></ruby>を、<ruby>辞典<rt>じてん</rt></ruby>の<ruby>見出<rt>みだ</rt></ruby>し<ruby>語<rt>ご</rt></ruby>（<ruby>基本<rt>きほん</rt></ruby>の<ruby>形<rt>かたち</rt></ruby>）になおしましょう。', items: [ 'ボールを<span class="target-word">投げた</span>→（　　　　　）', '<ruby>公園<rt>こうえん</rt></ruby>で<span class="target-word">遊んだ</span>→（　　　　　）', '<ruby>家<rt>か</rt></ruby>ぞくに<span class="target-word">話した</span>→（　　　　　）', '<ruby>早<rt>はや</rt></ruby>く<span class="target-word">走る</span>→（　　　　　）' ] }
+              ]
+            },
+            { id: 15, type: 'dic', layout: 'vertical', title: '国語辞典の使い方②',
+              sections: [
+                { inst: '一、<ruby>国語辞典<rt>こくごじてん</rt></ruby>に<ruby>出<rt>で</rt></ruby>てくる<ruby>順<rt>じゅん</rt></ruby>に<ruby>番号<rt>ばんごう</rt></ruby>を<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '（　　）あさ　（　　）あき　（　　）あめ', '（　　）かみ　（　　）かお　（　　）かさ', '（　　）ふしぎ　（　　）ふろしき　（　　）ひろい', '（　　）ホール　（　　）ポール　（　　）ボール', '（　　）しめい　（　　）しめきり　（　　）しめな', '（　　）クラス　（　　）くらす　（　　）グラス', '（　　）バレー　（　　）バレエ　（　　）パレード' ] },
+                { inst: '二、<ruby>見出<rt>みだ</rt></ruby>し<ruby>語<rt>ご</rt></ruby>になおして<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '<ruby>氷<rt>こおり</rt></ruby>が<span class="target-word">とけて</span>→（　　　　）', '<ruby>音楽<rt>おんがく</rt></ruby>を<span class="target-word">きく</span>→（　　　　）', '<ruby>星<rt>ほし</rt></ruby>が<span class="target-word">かがやく</span>→（　　　　）' ] }
+              ]
+            },
+            { id: 16, type: 'grammar', layout: 'vertical', title: '主語と述語',
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の<ruby>文<rt>ぶん</rt></ruby>の<ruby>主語<rt>しゅご</rt></ruby>（だれが）に<ruby>二重線<rt>にじゅうせん</rt></ruby>、<ruby>述語<rt>じゅつご</rt></ruby>（どうした）に<ruby>波線<rt>なみせん</rt></ruby>を<ruby>引<rt>ひ</rt></ruby>きましょう。', items: [ '<ruby>弟<rt>おとうと</rt></ruby>が、<ruby>友<rt>とも</rt></ruby>だちといっしょに走った。', 'わたしは、<ruby>新<rt>あたら</rt></ruby>しいふでばこを買った。', '<ruby>赤<rt>あか</rt></ruby>い<ruby>車<rt>くるま</rt></ruby>が、<ruby>家<rt>いえ</rt></ruby>の<ruby>前<rt>まえ</rt></ruby>にとまった。', 'メロンは、あまくておいしい。', 'きりんが、えさを食べる。', 'はりのあなは、<ruby>小<rt>ちい</rt></ruby>さい。' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>の<ruby>文<rt>ぶん</rt></ruby>の<ruby>主語<rt>しゅご</rt></ruby>と<ruby>述語<rt>じゅつご</rt></ruby>を<ruby>書<rt>か</rt></ruby>きぬきましょう。', items: [ '「ぼくは、つめたいジュースを飲む。」', '<ruby>主語<rt>しゅご</rt></ruby>（　　　　　）　<ruby>述語<rt>じゅつご</rt></ruby>（　　　　　）' ] },
+                { inst: '三、<ruby>主語<rt>しゅご</rt></ruby>と<ruby>述語<rt>じゅつご</rt></ruby>が<ruby>合<rt>あ</rt></ruby>うように、<ruby>線<rt>せん</rt></ruby>で<ruby>結<rt>むす</rt></ruby>びましょう。', items: [ '<div class="match-container"><div class="match-item"><ruby>犬<rt>いぬ</rt></ruby>が　・</div><div class="match-item"><ruby>風<rt>かぜ</rt></ruby>が　・</div><div class="match-item"><ruby>歌<rt>うた</rt></ruby>が　・</div><div class="match-item">おかしは・</div></div>' + '<div class="match-container"><div class="match-item">・　<ruby>走<rt>はし</rt></ruby>る</div><div class="match-item">・　ふく</div><div class="match-item">・　<ruby>聞<rt>き</rt></ruby>こえる</div><div class="match-item">・　おいしい</div></div>' ], isMatch: true }
+              ]
+            },
+            { id: 17, type: 'grammar', layout: 'vertical', title: '修飾語',
+              sections: [
+                { inst: '一、<ruby>次<rt>つぎ</rt></ruby>の<ruby>文<rt>ぶん</rt></ruby>から<ruby>修飾語<rt>しゅうしょくご</rt></ruby>（くわしくする<ruby>言葉<rt>ことば</rt></ruby>）をえらんで<ruby>書<rt>か</rt></ruby>きましょう。', items: [ 'おばあさんが、<ruby>夕<rt>ゆう</rt></ruby>ごはんを作った。→（　　　　　）', 'わたしは、<ruby>長<rt>なが</rt></ruby>い<ruby>手紙<rt>てがみ</rt></ruby>を書いた。　　→（　　　　　）', 'はりのあなは、とても<ruby>小<rt>ちい</rt></ruby>さい。　　→（　　　　　）', 'ゾウは、<ruby>大<rt>おお</rt></ruby>きな<ruby>動物<rt>どうぶつ</rt></ruby>だ。　　　　　→（　　　　　）' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>の（　）に<ruby>修飾語<rt>しゅうしょくご</rt></ruby>を<ruby>入<rt>い</rt></ruby>れて、<ruby>文<rt>ぶん</rt></ruby>をくわしくしましょう。', items: [ '<ruby>星<rt>ほし</rt></ruby>が、（　　　　　）<ruby>光<rt>ひか</rt></ruby>る。', '<ruby>雨<rt>あめ</rt></ruby>が、（　　　　　）ふっている。', '（　　　　　）<ruby>花<rt>はな</rt></ruby>が、さいた。' ] },
+                { inst: '三、<ruby>修飾語<rt>しゅうしょくご</rt></ruby>を<ruby>使<rt>つか</rt></ruby>って、<ruby>次<rt>つぎ</rt></ruby>の<ruby>文<rt>ぶん</rt></ruby>をくわしく<ruby>書<rt>か</rt></ruby>きかえましょう。', items: [ '「<ruby>犬<rt>いぬ</rt></ruby>が走る。」→', '「<ruby>本<rt>ほん</rt></ruby>を読んだ。」→' ], isMeaning: true }
+              ]
+            },
+            { id: 18, type: 'kanji_read', layout: 'vertical', title: '漢字の音と訓①',
+              sections: [
+                { inst: '一、――<ruby>線<rt>せん</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>みがなを<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '<ruby>今日<rt>きょう</rt></ruby>は、<ruby>朝<rt>あさ</rt></ruby><ruby>早<rt>はや</rt></ruby>くおきて、朝食（　　　）をとった。', '<ruby>音楽<rt>おんがく</rt></ruby>の<ruby>時間<rt>じかん</rt></ruby>に、歌集（　　　）の<ruby>歌<rt>うた</rt></ruby>を歌った。', '<ruby>山登<rt>やまのぼ</rt></ruby>りをして、富士山（　　　）に<ruby>登<rt>のぼ</rt></ruby>った。', '<ruby>三人<rt>さんにん</rt></ruby>兄弟（　　　）で、<ruby>二人<rt>ふたり</rt></ruby>の<ruby>弟<rt>おとうと</rt></ruby>がいる。', '<ruby>原<rt>はら</rt></ruby>っぱに<ruby>行<rt>い</rt></ruby>って、四葉（　　　）のクローバーを<ruby>見<rt>み</rt></ruby>つけた。', '<ruby>社会科<rt>しゃかいか</rt></ruby>見学（　　　）で、<ruby>工場<rt>こうじょう</rt></ruby>の<ruby>様子<rt>ようす</rt></ruby>を見た。', '色紙（　　　）に、いろいろな<ruby>色<rt>いろ</rt></ruby>のペンで書いた。', '音読（　　　）の<ruby>宿題<rt>しゅくだい</rt></ruby>で、<ruby>教科書<rt>きょうかしょ</rt></ruby>を読んだ。' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>の「<ruby>音読<rt>おんよ</rt></ruby>み」と「<ruby>訓読<rt>くんよ</rt></ruby>み」を<ruby>使<rt>つか</rt></ruby>って<ruby>文<rt>ぶん</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましょう。', items: [ '「早」（ソウ・はやい）', '「楽」（ガク・たのしい）' ], isMeaning: true }
+              ]
+            },
+            { id: 19, type: 'kanji_read', layout: 'vertical', title: '漢字の音と訓②',
+              sections: [
+                { inst: '一、――<ruby>線<rt>せん</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>みがなを<ruby>書<rt>か</rt></ruby>きましょう。', items: [ '<ruby>体<rt>からだ</rt></ruby>を<ruby>温<rt>あたた</rt></ruby>めるために、温度（　　　）を<ruby>上<rt>あ</rt></ruby>げた。', '返事（　　　）が<ruby>聞<rt>き</rt></ruby>こえなかったので、聞き<ruby>返<rt>かえ</rt></ruby>した。', '水泳（　　　）<ruby>教室<rt>きょうしつ</rt></ruby>に<ruby>通<rt>かよ</rt></ruby>って、<ruby>速<rt>はや</rt></ruby>く泳ぐ<ruby>練習<rt>れんしゅう</rt></ruby>をした。', '集合（　　　）<ruby>時間<rt>じかん</rt></ruby>に<ruby>遅<rt>おく</rt></ruby>れないよう、<ruby>広場<rt>ひろば</rt></ruby>に集まった。', 'さむい<ruby>日<rt>ひ</rt></ruby>は、こい<ruby>緑色<rt>みどりいろ</rt></ruby>の緑茶（　　　）が<ruby>人気<rt>にんき</rt></ruby>です。', 'たくさんの<ruby>友<rt>とも</rt></ruby>だちといっしょに、<ruby>写真<rt>しゃしん</rt></ruby>に写（　　　）った。', 'クラス全員（　　　）で、<ruby>全<rt>すべ</rt></ruby>ての<ruby>教室<rt>きょうしつ</rt></ruby>をそうじした。', '<ruby>大根<rt>だいこん</rt></ruby>は、根（　　　）っこを食べる<ruby>野菜<rt>やさい</rt></ruby>です。' ] },
+                { inst: '二、<ruby>次<rt>つぎ</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>の「<ruby>音読<rt>おんよ</rt></ruby>み」と「<ruby>訓読<rt>くんよ</rt></ruby>み」を<ruby>使<rt>つか</rt></ruby>って<ruby>文<rt>ぶん</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましょう。', items: [ '「寒」（カン・さむい）', '「旅」（リョ・たび）' ], isMeaning: true }
+              ]
+            }
+        ];
+
+        function generateAllPages() {
+            const container = document.getElementById('sheets-container');
+            const selector = document.getElementById('pageSelector');
+
+            pages.forEach((page, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                const plainTitle = page.title.replace(/<ruby>.*?<\/ruby>/g, '');
+                opt.innerText = `P${page.id}. ${plainTitle}`; 
+                selector.appendChild(opt);
+
+                const sheet = document.createElement('div');
+                sheet.className = 'sheet';
+                sheet.id = `sheet-${index}`;
+                if (index === 0) sheet.classList.add('active');
+
+                // --- 縦書きレイアウト ---
+                if (page.layout === 'vertical') {
+                    sheet.classList.add('layout-vertical');
+                    
+                    const sidebar = document.createElement('div');
+                    sidebar.className = 'sidebar-v';
+                    const plainTitleHeader = "小学校中学年国語　" + page.title.replace(/<rt>.*?<\/rt>|<\/ruby>|<ruby>/g, '');
+                    
+                    sidebar.innerHTML = `
+                        <div class="v-header-title">
+                            ${plainTitleHeader}
+                        </div>
+                        <div class="v-header-name">
+                            （　　）年（　　）組　　名前（　　　　　　　　　　　　　　）
+                        </div>
+                    `;
+                    sheet.appendChild(sidebar);
+
+                    const main = document.createElement('div');
+                    main.className = 'main-v';
+
+                    if (page.type === 'story') {
+                        const storyWrapper = document.createElement('div');
+                        storyWrapper.className = 'story-layout-wrapper';
+                        
+                        page.questions.forEach(q => {
+                            const section = document.createElement('div');
+                            section.className = 'story-section';
+                            
+                            const header = document.createElement('div');
+                            header.className = 'story-header';
+                            
+                            const inst = document.createElement('div');
+                            inst.className = 'story-instruction';
+                            inst.innerHTML = q.title;
+                            header.appendChild(inst);
+                            
+                            const wordList = document.createElement('div');
+                            wordList.className = 'story-word-list';
+                            q.words.forEach(w => {
+                                const wd = document.createElement('div');
+                                wd.innerText = w;
+                                wordList.appendChild(wd);
+                            });
+                            header.appendChild(wordList);
+                            section.appendChild(header);
+                            
+                            const genko = document.createElement('div');
+                            genko.className = 'story-genko';
+                            genko.innerHTML = '<div class="story-genko-lines"></div>';
+                            section.appendChild(genko);
+                            
+                            storyWrapper.appendChild(section);
+                        });
+                        main.appendChild(storyWrapper);
+
+                    } else {
+                        page.sections.forEach(sec => {
+                            const secDiv = document.createElement('div');
+                            secDiv.className = 'section-v';
+                            
+                            const title = document.createElement('div');
+                            title.className = 'section-title';
+                            title.innerHTML = sec.inst;
+                            secDiv.appendChild(title);
+
+                            if(page.type === 'sakubun-image') {
+                                 const wrapper = document.createElement('div');
+                                 wrapper.className = 'sakubun-image-layout';
+                                 
+                                 const rightPane = document.createElement('div');
+                                 rightPane.className = 'sil-right-pane';
+                                 
+                                 const memoContainer = document.createElement('div');
+                                 memoContainer.className = 'sil-memo-container';
+                                 
+                                 sec.table.forEach(row => {
+                                     const memoCol = document.createElement('div');
+                                     memoCol.className = 'sil-memo-col';
+                                     memoCol.innerHTML = `
+                                         <div class="sil-memo-label">${row.l}</div>
+                                         <div class="sil-memo-input"></div>
+                                     `;
+                                     memoContainer.appendChild(memoCol);
+                                 });
+                                 rightPane.appendChild(memoContainer);
+                                 
+                                 const exampleBox = document.createElement('div');
+                                 exampleBox.className = 'sil-example-box';
+                                 exampleBox.innerHTML = '<div class="sil-example-title">例文</div>' + sec.desc.replace(/\n/g, '<br>');
+                                 rightPane.appendChild(exampleBox);
+                                 
+                                 wrapper.appendChild(rightPane);
+                                 
+                                 const leftPane = document.createElement('div');
+                                 leftPane.className = 'sil-left-pane';
+                                 
+                                 for(let i=0; i<5; i++){
+                                     const genkoCol = document.createElement('div');
+                                     genkoCol.className = 'sil-genko-col';
+                                     leftPane.appendChild(genkoCol);
+                                 }
+                                 wrapper.appendChild(leftPane);
+                                 
+                                 secDiv.appendChild(wrapper);
+
+                            } else if(sec.isKanjiNew) { 
+                                const container = document.createElement('div');
+                                container.className = 'kanji-new-layout';
+                                
+                                const upperItems = sec.items.slice(0, 4);
+                                const lowerItems = sec.items.slice(4, 8);
+                                
+                                const upperCol = document.createElement('div');
+                                upperCol.className = 'kanji-new-col';
+                                upperItems.forEach(item => {
+                                    const div = document.createElement('div');
+                                    div.className = 'kanji-new-item';
+                                    div.innerHTML = `<div class="kanji-new-text">${item}</div><div class="kanji-new-box"></div>`;
+                                    upperCol.appendChild(div);
+                                });
+                                
+                                const lowerCol = document.createElement('div');
+                                lowerCol.className = 'kanji-new-col';
+                                lowerItems.forEach(item => {
+                                    const div = document.createElement('div');
+                                    div.className = 'kanji-new-item';
+                                    div.innerHTML = `<div class="kanji-new-text">${item}</div><div class="kanji-new-box"></div>`;
+                                    lowerCol.appendChild(div);
+                                });
+                                
+                                container.appendChild(upperCol);
+                                container.appendChild(lowerCol);
+                                secDiv.appendChild(container);
+
+                            } else if(sec.isMeaning) { 
+                                sec.items.forEach(item => {
+                                    const box = document.createElement('div');
+                                    box.className = 'meaning-box';
+                                    box.innerHTML = `<div>${item}</div><div class="write-line-v"></div>`;
+                                    secDiv.appendChild(box);
+                                });
+                            } else if (sec.isMatch) { 
+                                sec.items.forEach(item => {
+                                    const matchDiv = document.createElement('div');
+                                    matchDiv.style.height = '100%';
+                                    matchDiv.style.display = 'flex';
+                                    matchDiv.style.justifyContent = 'space-around';
+                                    matchDiv.innerHTML = item;
+                                    secDiv.appendChild(matchDiv);
+                                });
+                            } else { 
+                                sec.items.forEach(item => {
+                                    const qDiv = document.createElement('div');
+                                    qDiv.className = 'kotowaza-item';
+                                    let txt = item.replace(/（　）/g, '（　　　　）').replace(/（　　）/g, '（　　　　）').replace(/（　　　）/g, '（　　　　）');
+                                    qDiv.innerHTML = txt;
+                                    secDiv.appendChild(qDiv);
+                            });
+                            }
+                            main.appendChild(secDiv);
+                        });
+                    }
+                    sheet.appendChild(main);
+
+                // --- 横書きレイアウト ---
+                } else {
+                    sheet.classList.add('layout-horizontal');
+                    const header = document.createElement('div');
+                    header.className = 'header-h';
+                    const plainTitleH = page.title.replace(/<rt>.*?<\/rt>|<\/ruby>|<ruby>/g, '');
+                    header.innerHTML = `
+                        <div class="h-header-title">小学校 中学年 国語　${plainTitleH}</div>
+                        <div class="h-header-name">
+                            （　　）年（　　）組　　名前（　　　　　　　　　　　　　　）
+                        </div>
+                    `;
+                    sheet.appendChild(header);
+
+                    const main = document.createElement('div');
+                    main.className = 'main-h';
+
+                    page.sections.forEach(sec => {
+                        const secBox = document.createElement('div');
+                        secBox.className = 'section-box';
+                        const title = document.createElement('div');
+                        title.className = 'section-title';
+                        title.innerHTML = sec.inst;
+                        secBox.appendChild(title);
+
+                        if (page.type === 'romaji') {
+                            const rGrid = document.createElement('div');
+                            rGrid.className = 'romaji-grid';
+                            sec.items.forEach(item => {
+                                const rItem = document.createElement('div');
+                                rItem.className = 'romaji-item';
+                                rItem.innerHTML = `<div class="romaji-q">${item}</div><div class="romaji-line"></div>`;
+                                rGrid.appendChild(rItem);
+                            });
+                            secBox.appendChild(rGrid);
+                        }
+                        main.appendChild(secBox);
+                    });
+                    sheet.appendChild(main);
+                }
+                container.appendChild(sheet);
+            });
+        }
+
+        function switchView() {
+            const index = document.getElementById('pageSelector').value;
+            document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+            document.getElementById(`sheet-${index}`).classList.add('active');
+        }
+
+        window.onload = generateAllPages;
+    </script>
+</body>
+</html>
